@@ -14,11 +14,14 @@ public class PurchasedItems{
     private BigDecimal totalPrice;
     private double totalExpectedWeight;
     private BigDecimal change;
+    private BigDecimal amountPaid;
 
     public PurchasedItems(){
         listOfProducts = new ArrayList<>();
         totalPrice = new BigDecimal(0);
+        amountPaid = new BigDecimal(0);
         totalExpectedWeight = 0;
+
         change = new BigDecimal(0);
     }
 

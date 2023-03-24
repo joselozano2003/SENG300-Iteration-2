@@ -11,7 +11,6 @@ import com.autovend.devices.SimulationException;
 public abstract class Pay extends AbstractDevice<PayObserver> {
     protected SelfCheckoutStation station;
 
-    protected PurchasedItems items;
     protected BigDecimal amountDue;
     protected BigDecimal amountPaid;
 
@@ -22,17 +21,10 @@ public abstract class Pay extends AbstractDevice<PayObserver> {
         }
 
         this.station = station;
-        this.items = items;
+        amountDue = items.getTotalPrice();
+        amountPaid = new BigDecimal(0); // Add method
 
-        // initialize fields
-        amountDue = new BigDecimal(0);
-        amountPaid = new BigDecimal(0);
     }
-
-
-    abstract void pay();
-
-    abstract void finishPay();
 
     public BigDecimal getAmountPaid() {
         return amountPaid;
