@@ -26,8 +26,9 @@ import com.autovend.devices.observers.BillValidatorObserver;
 public class PayWithCash extends Pay implements BillDispenserObserver, BillValidatorObserver {
 
 
-
-
+    public PayWithCash(SelfCheckoutStation station, PurchasedItems items) {
+        super(station, items);
+    }
 
     @Override
     public void reactToEnabledEvent(AbstractDevice<? extends AbstractDeviceObserver> device) {
@@ -76,6 +77,16 @@ public class PayWithCash extends Pay implements BillDispenserObserver, BillValid
 
     @Override
     public void reactToInvalidBillDetectedEvent(BillValidator validator) {
+
+    }
+
+    @Override
+    void pay() {
+
+    }
+
+    @Override
+    void finishPay() {
 
     }
 }
