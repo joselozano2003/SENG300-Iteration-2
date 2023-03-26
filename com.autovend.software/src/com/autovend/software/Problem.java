@@ -1,3 +1,5 @@
+package com.autovend.software;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 public class Problem{
