@@ -80,7 +80,6 @@ public class PayWithCash extends Pay implements BillDispenserObserver, BillValid
 
     }
 
-    @Override
     void pay() {
 
     }
