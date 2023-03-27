@@ -1,0 +1,16 @@
+package com.autovend.software;
+
+import java.util.ArrayList;
+
+import com.autovend.devices.*;
+import com.autovend.products.BarcodedProduct;
+
+public class AddOrRemoveBags {
+	public 
+	public ArrayList<Integer> bags;
+	
+	public AddOrRemoveBags() {
+		
+	}
+
+}

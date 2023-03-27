@@ -1,0 +1,8 @@
+INDEX VERSION 1.131+C:\Users\swaguy14256\Documents\School\tods garbedge machine\SENG300-Iteration-2\.metadata\.plugins\org.eclipse.jdt.core
+1865797976.index
+2879900258.index
+1384685210.index
+2232633827.index
+3765050272.index
+2218371263.index
+3011209426.index
