@@ -6,13 +6,7 @@ import com.autovend.products.BarcodedProduct;
 
 import java.util.ArrayList;
 
-public class PrintReceipt {
-
-    /**
-     * This method prints the receipt for the customer. It is executed after the customer has paid for the items.
-     * TODO: Get a signal from the payment system that the customer has paid.
-     * TODO: Create handles for the exceptions that may be thrown by the printer.
-     */
+public class PrinterController {
 
     private String receipt;
     private final ReceiptPrinterObserverStub rpo = new ReceiptPrinterObserverStub();
