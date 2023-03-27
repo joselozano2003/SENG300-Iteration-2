@@ -7,12 +7,14 @@ import com.autovend.Barcode;
 import com.autovend.products.BarcodedProduct;
 
 public class Bag extends BarcodedProduct {
-	public Bag(Barcode barcode, String description, BigDecimal price, double expectedWeight) {
-		super(barcode, description, price, expectedWeight);
-		
-	}
-
+	private boolean purchased;
 	public ArrayList<PurchasedItems> baggage;
 	private BigDecimal capacity;
-
+	public Bag(Barcode barcode, String description, BigDecimal price, double expectedWeight, boolean storebag) {
+		super(barcode, description, price, expectedWeight);
+		purchased = storebag;
+	}
+	public boolean gettype() {
+		return purchased;
+	}
 }

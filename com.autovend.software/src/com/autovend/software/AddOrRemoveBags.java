@@ -11,7 +11,6 @@ public class AddOrRemoveBags {
 	public int ownbags;
 	public int storebags;
 	public int bagsremaining;
-	private boolean purchased;
 	public BigDecimal price = new BigDecimal("0.25");
 	public BigDecimal weight = new BigDecimal("0.050");
 	
@@ -40,7 +39,7 @@ public class AddOrRemoveBags {
 	public void removebag(int bagnumber) throws SimulationException {
 		try {
 			Bag tempbag = bags.get(bagnumber);
-			if (true) {
+			if (tempbag.gettype() == true) {
 				storebags--;
 				if (tempbag.baggage.isEmpty()) {
 					bags.remove(bagnumber);
