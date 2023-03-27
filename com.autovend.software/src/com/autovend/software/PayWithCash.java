@@ -41,6 +41,7 @@ public class PayWithCash extends Pay implements BillDispenserObserver, BillValid
 	
     public PayWithCash(SelfCheckoutStation station, PurchasedItems items) {
         super(station, items);
+        
         if (amountToPay.compareTo(super.getAmountDue()) > 0) {
 			this.amountToPay = super.getAmountDue();
 		} else this.amountToPay = amountToPay;
