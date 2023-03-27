@@ -38,4 +38,8 @@ public abstract class Pay extends AbstractDevice<PayObserver> {
     public BigDecimal getAmountPaid() {
         return amountPaid;
     }
+    
+    public BigDecimal getAmountDue() {
+        return amountDue;
+    }
 }
