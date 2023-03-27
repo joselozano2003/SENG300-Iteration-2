@@ -5,6 +5,7 @@ import com.autovend.Card.CardData;
 import com.autovend.devices.AbstractDevice;
 import com.autovend.devices.CardReader;
 import com.autovend.devices.SelfCheckoutStation;
+import com.autovend.devices.SimulationException;
 import com.autovend.devices.observers.AbstractDeviceObserver;
 import com.autovend.devices.observers.CardReaderObserver;
 import com.autovend.external.CardIssuer;
@@ -17,9 +18,16 @@ public class PayWithCard extends Pay implements CardReaderObserver {
 	
 	public PayWithCard(SelfCheckoutStation station, PurchasedItems items, BigDecimal amountToPay, CardIssuer cardIssuer) {
 		super(station, items);
-		if (amountToPay.compareTo(super.getAmountDue()) > 0) {
-			this.amountToPay = super.getAmountDue();
+		
+		if (amountToPay == null || cardIssuer == null) {
+            throw new SimulationException(new NullPointerException("No argument may be null."));
+        }
+		
+		// Ensure that no change is produced when paying with card
+		if (amountToPay.compareTo(super.getAmountDue().subtract(super.getAmountPaid())) > 0) {
+			this.amountToPay = super.getAmountDue().subtract(super.getAmountPaid());
 		} else this.amountToPay = amountToPay;
+		
 		this.cardIssuer = cardIssuer;
 	}
 
@@ -60,9 +68,9 @@ public class PayWithCard extends Pay implements CardReaderObserver {
 	}
 	
 	public void reactToCardDataReadEvent(CardReader reader, CardData data) {
-		int holdNumber = cardIssuer.authorizeHold(data.getNumber(), amountToPay);
-		if (holdNumber == -1) return;
-		boolean transactionPosted = cardIssuer.postTransaction(data.getNumber(), holdNumber, amountToPay);
-		if (transactionPosted) super.Pay(amountToPay);
+		int holdNumber = cardIssuer.authorizeHold(data.getNumber(), amountToPay); 						  	// Contact card issuer and attempt to place a hold
+		if (holdNumber == -1) return; 																		// Return if hold is unable to be placed
+		boolean transactionPosted = cardIssuer.postTransaction(data.getNumber(), holdNumber, amountToPay); 	// Contact card issuer to attempt to post transaction
+		if (transactionPosted) super.Pay(amountToPay); 														// If transaction is posted, pay the amount
 	}
 }
