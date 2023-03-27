@@ -57,6 +57,13 @@ public class PurchasedItems{
     public BigDecimal getChange(){
         return change;
     }
+    
+    public void setAmountPaid(BigDecimal amountPaid) {
+    	this.amountPaid = amountPaid;
+    }
 
+    public BigDecimal getAmountPaid(){
+        return amountPaid;
+    }
 }
 
