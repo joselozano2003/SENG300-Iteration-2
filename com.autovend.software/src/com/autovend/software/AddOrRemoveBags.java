@@ -3,8 +3,9 @@ package com.autovend.software;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
+import com.autovend.Barcode;
 import com.autovend.devices.*;
-import com.autovend.products.BarcodedProduct;
+import com.autovend.products.*;
 
 public class AddOrRemoveBags {
 	public ArrayList<Bag> bags;
@@ -13,18 +14,20 @@ public class AddOrRemoveBags {
 	public int bagsremaining;
 	public BigDecimal price = new BigDecimal("0.25");
 	public BigDecimal weight = new BigDecimal("0.050");
-	
+	public PurchasedItems purchase;
 	public AddOrRemoveBags() {
 		
 	}
 	
-	public void purchasebag() throws SimulationException {
+	public void purchasebag(Barcode code, String description, BigDecimal price, double expectedWeight) throws SimulationException {
 		if (bagsremaining == 0) {
 			throw new SimulationException("We are out of bags. Get some more from the attendant bub.");
 		}
 		else {
 			bagsremaining--;
-			//bags.add(new Bag(true));
+			Bag newbag = new Bag(code, description, price, expectedWeight, true);
+			bags.add(newbag);
+			purchase.addProduct(newbag);
 			if (storebags == Integer.MAX_VALUE) {
 				throw new SimulationException("what - how did you even buy that many bags...?");
 			}
