@@ -9,11 +9,26 @@ import java.util.ArrayList;
 public class PrinterController {
 
     private String receipt;
-    private final ReceiptPrinterObserverStub rpo = new ReceiptPrinterObserverStub();
+    private final ReceiptPrinterObserverStub rpo;
+    ReceiptPrinter printer;
+    int inkAdded;
+    int paperAdded;
+    int inkUsed;
+    int paperUsed;
+    boolean canPrint;
 
 
-    public void printReceipt(SelfCheckoutStation station, PurchasedItems purchasedItems) throws OverloadException {
-        station.printer.register(rpo);
+    public PrinterController(SelfCheckoutStation station) {
+        printer = station.printer;
+        rpo = new ReceiptPrinterObserverStub();
+        inkAdded = 0;
+        paperAdded = 0;
+        inkUsed = 0;
+        paperUsed = 0;
+    }
+
+
+    public void printReceipt(PurchasedItems purchasedItems) throws OverloadException, InsufficientResourcesException {
         ArrayList<BarcodedProduct> items = purchasedItems.getListOfProducts();
 
         // Give the receipt a title
@@ -35,22 +50,69 @@ public class PrinterController {
 
         StringBuilder finalReceipt = new StringBuilder();
         finalReceipt.append(receiptTitle).append(receiptItems).append(receiptChangeAndTotal);
-        try {
-            // Print the receipt content, if it runs out of ink or paper then disable the printer
-            for (int i = 0; i < finalReceipt.length(); i++) {
-                // These should notify an attendant and disable the printer
-                if (!rpo.hasPaper()) { station.printer.disable(); }
-                if (!rpo.hasInk()) { station.printer.disable(); }
-                station.printer.print(finalReceipt.charAt(i));
-            }
-        } catch (EmptyException e) {
-            // Disable the printer and notify attendant
-            station.printer.disable();
-        }
 
-        station.printer.cutPaper();
-        receipt = station.printer.removeReceipt();
+        canPrint = testResources(finalReceipt);
+        if (canPrint) {
+            try {
+                // Print the receipt content, if it runs out of ink or paper then disable the printer
+                for (int i = 0; i < finalReceipt.length(); i++) {
+                    // These should notify an attendant and disable the printer
+                    if (!rpo.hasPaper()) {
+                        printer.disable();
+                    }
+                    if (!rpo.hasInk()) {
+                        printer.disable();
+                    }
+                    printer.print(finalReceipt.charAt(i));
+                }
+            } catch (EmptyException e) {
+                // Disable the printer and notify attendant
+                printer.disable();
+            }
+
+            printer.cutPaper();
+            receipt = printer.removeReceipt();
+        }
+        else {
+            // Notify the user that there are not enough resources to print the receipt
+            throw new InsufficientResourcesException("There are not enough resources to print the receipt.");
+
+        }
     }
 
     public String getReceipt() { return receipt; }
+
+    public void insertPaper(int amount) throws OverloadException {
+        paperAdded += amount;
+        printer.addPaper(amount);
+    }
+
+    public void insertInk(int amount) throws OverloadException {
+        inkAdded += amount;
+        printer.addInk(amount);
+    }
+
+    public boolean testResources(StringBuilder sb) {
+        int inkCount = 0;
+        int paperCount = 0;
+        for (int i = 0; i < sb.length(); i++) {
+            char c = sb.charAt(i);
+            if (!Character.isWhitespace(c)) {
+                inkCount++;
+            }
+            if (c == '\n') {
+                paperCount++;
+            }
+        }
+        // Check if the printer has enough resources to print the receipt
+        if ((inkCount + inkUsed < inkAdded) && (paperCount + paperUsed < paperAdded)) {
+            inkUsed += inkCount;
+            paperUsed += paperCount;
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
 }
