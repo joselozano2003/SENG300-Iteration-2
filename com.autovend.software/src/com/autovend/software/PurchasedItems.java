@@ -11,11 +11,11 @@ import java.util.ArrayList;
 public class PurchasedItems{
 
     private static ArrayList<BarcodedProduct> listOfProducts;
-    private BigDecimal totalPrice;
-    private double totalExpectedWeight;
-    private BigDecimal change;
-    private BigDecimal amountPaid;
-
+    private static BigDecimal totalPrice;
+    private static double totalExpectedWeight;
+    private static BigDecimal change;
+    private static BigDecimal amountPaid;
+    /*
     public PurchasedItems(){
         listOfProducts = new ArrayList<>();
         totalPrice = new BigDecimal(0);
@@ -24,37 +24,37 @@ public class PurchasedItems{
 
         change = new BigDecimal(0);
     }
-
-    public void addProduct(BarcodedProduct product){
+*/
+    public static void addProduct(BarcodedProduct product){
         listOfProducts.add(product);
         totalPrice = totalPrice.add(product.getPrice());
         totalExpectedWeight += product.getExpectedWeight();
     }
 
-    public ArrayList<BarcodedProduct> getListOfProducts(){
+    public static ArrayList<BarcodedProduct> getListOfProducts(){
         return listOfProducts;
     }
 
     // I think this is not necessary for this iteration but will be useful for future ones
-    public void removeProduct(BarcodedProduct product){
+    public static void removeProduct(BarcodedProduct product){
         listOfProducts.remove(product);
         totalPrice = totalPrice.subtract(product.getPrice());
         totalExpectedWeight -= product.getExpectedWeight();
     }
 
-    public BigDecimal getTotalPrice(){
+    public static BigDecimal getTotalPrice(){
         return totalPrice;
     }
 
-    public double getTotalExpectedWeight(){
+    public static double getTotalExpectedWeight(){
         return totalExpectedWeight;
     }
 
-    public void setChange(BigDecimal change){
+    public static void setChange(BigDecimal change){
         this.change = change;
     }
 
-    public BigDecimal getChange(){
+    public static BigDecimal getChange(){
         return change;
     }
 
