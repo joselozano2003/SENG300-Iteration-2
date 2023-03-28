@@ -8,9 +8,10 @@ import com.autovend.devices.AbstractDevice;
 import com.autovend.devices.SelfCheckoutStation;
 import com.autovend.devices.SimulationException;
 
+
 public abstract class Pay extends AbstractDevice<PayObserver> {
     protected SelfCheckoutStation station;
-
+    protected PurchasedItems items;
     protected BigDecimal amountDue;
     protected BigDecimal amountPaid;
 
@@ -21,12 +22,31 @@ public abstract class Pay extends AbstractDevice<PayObserver> {
         }
 
         this.station = station;
+        this.items = items;
         amountDue = items.getTotalPrice();
-        amountPaid = new BigDecimal(0); // Add method
+        amountPaid = items.getAmountPaid();
 
     }
 
+    /**
+     * Updates amountPaid and creates a reactToSufficientPaymentEvent if payment is sufficient to cover the bill
+     * @param amountToPay
+     */
+    protected void Pay(BigDecimal amountToPay) {
+    	amountPaid = amountPaid.add(amountToPay);
+    	items.setAmountPaid(amountPaid);
+    	if (amountPaid.compareTo(amountDue) >= 0) {
+    		for (PayObserver observer : observers) {
+    			observer.reactToSufficientPaymentEvent(this);
+    		}
+    	}
+    }
+    
     public BigDecimal getAmountPaid() {
         return amountPaid;
+    }
+    
+    public BigDecimal getAmountDue() {
+        return amountDue;
     }
 }
