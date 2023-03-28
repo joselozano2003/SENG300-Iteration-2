@@ -1,5 +1,3 @@
-
-
 package com.autovend.software;
 
 import com.autovend.products.BarcodedProduct;
@@ -15,8 +13,8 @@ public class PurchasedItems{
     private static double totalExpectedWeight;
     private static BigDecimal change;
     private static BigDecimal amountPaid;
-    /*
-    public PurchasedItems(){
+
+    static {
         listOfProducts = new ArrayList<>();
         totalPrice = new BigDecimal(0);
         amountPaid = new BigDecimal(0);
@@ -24,7 +22,7 @@ public class PurchasedItems{
 
         change = new BigDecimal(0);
     }
-*/
+
     public static void addProduct(BarcodedProduct product){
         listOfProducts.add(product);
         totalPrice = totalPrice.add(product.getPrice());
@@ -50,13 +48,19 @@ public class PurchasedItems{
         return totalExpectedWeight;
     }
 
-    public static void setChange(BigDecimal change){
-        this.change = change;
+    public static void setChange(BigDecimal amount){
+        change = amount;
     }
 
     public static BigDecimal getChange(){
         return change;
     }
 
-}
+    public static void setAmountPaid(BigDecimal amount) {
+        amountPaid = amount;
+    }
 
+    public static BigDecimal getAmountPaid(){
+        return amountPaid;
+    }
+}
