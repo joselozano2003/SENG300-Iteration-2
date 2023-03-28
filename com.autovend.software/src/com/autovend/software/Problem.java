@@ -1,10 +1,10 @@
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.math.BigDecimal;
 public class Problem{
-	public ArrayList<Integer> set;
-	public Integer sum;
+	public ArrayList<BigDecimal> set;
+	public BigDecimal sum;
 	
-	public Problem(ArrayList<Integer> inputList, Integer inputSum)
+	public Problem(ArrayList<BigDecimal> inputList, BigDecimal inputSum)
 	{
 		set = (ArrayList)inputList.clone();
 		sum = inputSum;
