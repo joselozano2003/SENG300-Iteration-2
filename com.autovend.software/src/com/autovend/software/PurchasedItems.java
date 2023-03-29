@@ -85,5 +85,8 @@ public class PurchasedItems{
     // This method is used for testing purposes ONLY for scanItemsTest
     public void setAmountPaid(BigDecimal amount) {
     	amountPaid = amount;
+        if (amountPaid.compareTo(totalPrice) >= 0) {
+            isPaid = true;
+        }
     }
 }
