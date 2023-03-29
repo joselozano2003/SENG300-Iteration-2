@@ -31,6 +31,7 @@ public class PurchasedItems{
         if (totalPrice.compareTo(amountPaid) >= 0) {
             isPaid = false;
         }
+
     }
 
     public static ArrayList<BarcodedProduct> getListOfProducts(){
@@ -78,5 +79,11 @@ public class PurchasedItems{
 
     public static BigDecimal getAmountLeftToPay() {
     	return totalPrice.subtract(amountPaid);
+    }
+
+
+    // This method is used for testing purposes ONLY for scanItemsTest
+    public void setAmountPaid(BigDecimal amount) {
+    	amountPaid = amount;
     }
 }
