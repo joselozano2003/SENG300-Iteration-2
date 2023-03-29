@@ -10,49 +10,55 @@ public class AddOrRemoveBags {
 	public ArrayList<Bag> bags;
 	public int ownbags;
 	public int storebags;
-	public int bagsremaining;
+	public ArrayList<Bag> bagsremaining;
 	public BigDecimal price = new BigDecimal("0.25");
 	public double weight = 0.05;
 	public PurchasedItems purchase;
-	public AddOrRemoveBags() {}
-	public void purchasebag(Barcode code, String description) throws SimulationException {
-		if (bagsremaining == 0) {
+	public AddOrRemoveBags() {
+		bags = new ArrayList<Bag>();
+		ownbags = 0;
+		storebags = 0;
+		bagsremaining = new ArrayList<Bag>();
+		purchase = new PurchasedItems();
+	}
+	public void purchaseBag() throws SimulationException {
+		if (bagsremaining.isEmpty()) {
 			throw new SimulationException("We are out of bags. Get some more from the attendant bub.");
 		}
 		else {
-			bagsremaining--;
-			Bag newbag = new Bag(code, description, price, weight, true);
-			bags.add(newbag);
-			purchase.addProduct(newbag);
+			bags.add(bagsremaining.get(0));
+			purchase.addProduct(bagsremaining.get(0));
+			bagsremaining.remove(0);
 			if (storebags == Integer.MAX_VALUE) {
 				throw new SimulationException("what - how did you even buy that many bags...?");
 			}
 			storebags++;
 		}
 	}
-	public void addownbag(Barcode code, String description, BigDecimal noprice) {
-		Bag selfbag = new Bag(code, description, noprice, weight, false);
+	public void addOwnBag(String description, double bagweight) {
+		Barcode zerocode = new Barcode(Numeral.valueOf("zero"));
+		Bag selfbag = new Bag(zerocode, description, BigDecimal.valueOf(0.00000000000001), bagweight, false);
 		bags.add(selfbag);
 		if (ownbags == Integer.MAX_VALUE) {
 			throw new SimulationException("...why do you even have this many bags in the first place?");
 		}
-		
+		ownbags++;
 	}
-	public void removebag(Bag tempbag) throws SimulationException {
+	public void removeBag(Bag tempbag) throws SimulationException {
 		try {
 			if (tempbag.gettype() == true) {
-				storebags--;
 				if (tempbag.baggage.isEmpty()) {
 					bags.remove(tempbag);
+					storebags--;
 				}
 				else {
 					throw new SimulationException("Empty this bag first. You think these are free?");
 				}
 			}
 			else {
-				ownbags--;
 				if (tempbag.baggage.isEmpty()) {
 					bags.remove(tempbag);
+					ownbags--;
 				}
 				else {
 					throw new SimulationException("Empty this bag first. Or do you plan on returning what is in this bag?");
@@ -63,7 +69,7 @@ public class AddOrRemoveBags {
 			throw new SimulationException("What are you even trying to remove? Air?");
 		}
 	}
-	public void monitorbags() {
+	public void monitorBags() {
 		for (int i = 0; i<bags.size();i++) {
 			Bag bag = bags.get(i);
 			System.out.println("Bag " + bag.getDescription() + ":");
@@ -73,5 +79,12 @@ public class AddOrRemoveBags {
 				System.out.println(bag.baggage.get(a));
 			}
 		}
+	}
+	//method to add more store bags
+	public void addStoreBag(Bag bag) {
+		if(bag == null) {
+			throw new SimulationException("Can't add a null bag");
+		}
+		bagsremaining.add(bag);
 	}
 }

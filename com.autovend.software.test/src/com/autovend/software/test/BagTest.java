@@ -84,7 +84,7 @@ public class BagTest {
 	@Test
 	public void removeItemTest2() {
 		PurchasedItems item = new PurchasedItems();
-		Numeral num = Numeral.valueOf("three");
+		Numeral num = Numeral.valueOf("four");
 		Barcode bar = new Barcode(num);
 		String str = "test item";
 		BigDecimal price = BigDecimal.valueOf(0.5);
@@ -112,7 +112,7 @@ public class BagTest {
 		@Test
 		public void emptyBagTest2() {
 			PurchasedItems item = new PurchasedItems();
-			Numeral num = Numeral.valueOf("three");
+			Numeral num = Numeral.valueOf("five");
 			Barcode bar = new Barcode(num);
 			String str = "test item";
 			BigDecimal price = BigDecimal.valueOf(0.5);
