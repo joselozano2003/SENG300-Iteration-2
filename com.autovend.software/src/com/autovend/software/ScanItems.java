@@ -2,10 +2,6 @@
 
 package com.autovend.software;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import com.autovend.Barcode;
 import com.autovend.BarcodedUnit;
 import com.autovend.devices.AbstractDevice;
@@ -18,6 +14,7 @@ import com.autovend.devices.observers.BarcodeScannerObserver;
 import com.autovend.devices.observers.ElectronicScaleObserver;
 import com.autovend.external.ProductDatabases;
 import com.autovend.products.BarcodedProduct;
+import com.autovend.software.test.CustomerIOStub;
 
 public class ScanItems implements BarcodeScannerObserver, ElectronicScaleObserver{
 

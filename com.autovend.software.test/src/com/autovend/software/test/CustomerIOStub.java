@@ -1,6 +1,6 @@
 
 
-package com.autovend.software;
+package com.autovend.software.test;
 
 import com.autovend.BarcodedUnit;
 import com.autovend.devices.SelfCheckoutStation;
