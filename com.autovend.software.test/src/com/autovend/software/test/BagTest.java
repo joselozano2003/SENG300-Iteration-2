@@ -57,7 +57,7 @@ public class BagTest {
 	@Test
 	public void addItemTest2() {
 		PurchasedItems item = new PurchasedItems();
-		Numeral num = Numeral.valueOf("two");
+		Numeral num = Numeral.valueOf("three");
 		Barcode bar = new Barcode(num);
 		String str = "test item";
 		BigDecimal price = BigDecimal.valueOf(0.5);
@@ -67,5 +67,66 @@ public class BagTest {
 		try {
 			bag.additem(item);
 		} catch (OverloadException e) {}
+		assertEquals(bag.baggage.get(0).getTotalExpectedWeight(), 10, 0);
 	}
+	//tests if an exception is thrown when an item is attempted to be removed from an empty bag
+	@Test
+	public void removeItemTest1() {
+		boolean failed = false;
+		try {
+			bag.removeitem(null);
+		}catch(SimulationException e) {
+			failed = true;
+		}
+		assertTrue(failed);
+	}
+	//tests if an item is removed correctly
+	@Test
+	public void removeItemTest2() {
+		PurchasedItems item = new PurchasedItems();
+		Numeral num = Numeral.valueOf("three");
+		Barcode bar = new Barcode(num);
+		String str = "test item";
+		BigDecimal price = BigDecimal.valueOf(0.5);
+		double weight = 10;
+		BarcodedProduct product = new BarcodedProduct(bar,str,price,weight);
+		item.addProduct(product);
+		try {
+			bag.additem(item);
+		} catch (OverloadException e) {}
+		bag.removeitem(item);
+		assertTrue(bag.baggage.isEmpty());
+	}
+	//tests if an exception is thrown when a bag is attempted to be emptied from an empty bag
+	@Test
+	public void emptyBagTest1() {
+		boolean failed = false;
+		try {
+			bag.emptyBag();
+		}catch(SimulationException e) {
+			failed = true;
+		}
+		assertTrue(failed);
+	}
+	//tests if a bag is emptied correctly
+		@Test
+		public void emptyBagTest2() {
+			PurchasedItems item = new PurchasedItems();
+			Numeral num = Numeral.valueOf("three");
+			Barcode bar = new Barcode(num);
+			String str = "test item";
+			BigDecimal price = BigDecimal.valueOf(0.5);
+			double weight = 10;
+			BarcodedProduct product = new BarcodedProduct(bar,str,price,weight);
+			item.addProduct(product);
+			try {
+				bag.additem(item);
+			} catch (OverloadException e) {}
+			bag.emptyBag();
+			assertTrue(bag.baggage.isEmpty());
+		}
+	
+	
+	
+	
 }

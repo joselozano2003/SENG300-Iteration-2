@@ -16,6 +16,7 @@ public class Bag extends BarcodedProduct {
 	public Bag(Barcode barcode, String description, BigDecimal price, double expectedWeight, boolean storebag) {
 		super(barcode, description, price, expectedWeight);
 		purchased = storebag;
+		baggage = new ArrayList<PurchasedItems>();
 	}
 	public boolean gettype() {
 		return purchased;
@@ -37,7 +38,7 @@ public class Bag extends BarcodedProduct {
 			bagweight -= item.getTotalExpectedWeight();
 		}
 	}
-	public void emptybag() {
+	public void emptyBag() {
 		if (baggage.isEmpty()) {
 			throw new SimulationException("What are you even trying to remove? Air?");
 		}
