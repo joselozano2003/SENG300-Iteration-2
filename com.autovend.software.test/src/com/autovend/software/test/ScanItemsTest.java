@@ -1,11 +1,4 @@
-/*
-    Dante Kirsman: 30120778
-    Jose Camilo Lozano Cetina: 30144736
-    Rheanna Fielder: 30092060
-    Alex Tran: 30075197
-    Vita Vysochina: 30118374
-    Ishita Chandra: 30159580
- */
+
 
 package com.autovend.software.test;
 
