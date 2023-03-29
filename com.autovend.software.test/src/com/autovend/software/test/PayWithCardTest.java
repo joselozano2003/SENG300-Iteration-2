@@ -40,6 +40,7 @@ public class PayWithCardTest{
 	
 	Calendar exipery = new GregorianCalendar(2025, Calendar.OCTOBER, 31);
 	CardIssuer company = new CardIssuer("TD");
+	CardIssuer company2 = new CardIssuer("BMO");
 
 	Currency currency = Currency.getInstance("CAD");
 	int[] billDenominations = {1, 2, 5, 10};
@@ -75,11 +76,11 @@ public void setUp() {
 	scs = new SelfCheckoutStation(currency, billDom, coinDom, 10000,2);
 	
 
-	CreditCard Credit = new CreditCard("CREDIT","1234567890123456", "credit", "123", "1234", true, true);
-	DebitCard Debit = new DebitCard("DEBIT","1234567890123456", "debit", "123", "1234", true, true);
+	//CreditCard Credit = new CreditCard("CREDIT","1234567890123456", "credit", "123", "1234", true, true);
+	//DebitCard Debit = new DebitCard("DEBIT","1234567890123456", "debit", "123", "1234", true, true);
 	PayWithCard PayWithDebit = new PayWithCard(scs,company);
 	PayWithCard PayWithCredit = new PayWithCard(scs,company);
-	company.addCardData("1234567890123457","credit",exipery,"123",BigDecimal.valueOf(100));
+	//company.addCardData("1234567890123457","credit",exipery,"123",BigDecimal.valueOf(100));
 	company.addCardData("1234567890123458","debit",exipery,"123",BigDecimal.valueOf(100));
 
 	expectedCartPrice = new BigDecimal(0);
@@ -161,31 +162,37 @@ public void tearDown() {
 
 @Test
 public void testDebitTap() throws IOException {
-	PayWithCard cardReaderss = new PayWithCard(scs, company);
-	scs.cardReader.register(cardReaderss);
+	//PayWithCard cardReaderss = new PayWithCard(scs, company);
+	PayWithCard PayWithDebit = new PayWithCard(scs,company);
+	scs.cardReader.register(PayWithDebit);
 	scs.mainScanner.scan(unitItem1);
 	scs.baggingArea.add(unitItem1);
-	DebitCard Debit = new DebitCard("DEBIT", "1234567890123456", "debit", "123", "1234", true, true);
-
+	
+	DebitCard Debit = new DebitCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);
+	company.addCardData("0234567890223451","DEBIT",exipery,"123",BigDecimal.valueOf(100));
+	scs.cardReader.tap(Debit);
 	//System.out.println(totalCost.getTotalPrice());
 
-	BigDecimal test = PurchasedItems.getTotalPrice();
+	//BigDecimal test = PurchasedItems.getTotalPrice();
 	try {
-		scs.cardReader.tap(Debit);
-		System.out.println(PurchasedItems.getTotalPrice());
-		System.out.println(PurchasedItems.getAmountLeftToPay());
-		System.out.println(PurchasedItems.getAmountPaid());
+		PayWithDebit.pay(BigDecimal.valueOf(2.5));
+		//scs.cardReader.tap(Debit);
+		//System.out.println(PurchasedItems.getTotalPrice());
+		//System.out.println(PurchasedItems.getAmountLeftToPay());
+		//System.out.println(PurchasedItems.getAmountPaid());
 
-//		PayWithDebit.pay(milkPrice);
+		//PayWithDebit.pay(milkPrice);
 	} catch (SimulationException e) {
 		e.printStackTrace();
-    }catch (IOException e) {
+ //   }catch (IOException e) {
 
 		// TODO Auto-generated catch block
 		e.printStackTrace();
 	}
 //		System.out.println(totalCost.getTotalPrice());
-		Assert.assertEquals(new BigDecimal(2.00), PurchasedItems.getAmountPaid());
+		
+	
+	Assert.assertEquals(new BigDecimal(2.50), PurchasedItems.getAmountPaid());
 	}
 
 

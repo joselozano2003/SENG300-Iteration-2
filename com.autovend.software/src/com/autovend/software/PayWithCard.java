@@ -26,11 +26,11 @@ public class PayWithCard extends Pay implements CardReaderObserver {
         }
 		
 		// Ensure that no change is produced when paying with card
-//		if (amountToPay.compareTo(super.getAmountDue().subtract(PurchasedItems.getAmountPaid())) > 0) {
-//			this.amountToPay = super.getAmountDue().subtract(PurchasedItems.getAmountPaid());
-//		} else this.amountToPay = amountToPay;
-//
-//		this.cardIssuer = cardIssuer;
+		if (amountToPay.compareTo(super.getAmountDue().subtract(PurchasedItems.getAmountPaid())) > 0) {
+			this.amountToPay = super.getAmountDue().subtract(PurchasedItems.getAmountPaid());
+		} else this.amountToPay = amountToPay;
+
+		this.cardIssuer = cardIssuer;
 	}
 
 	@Override
