@@ -4,13 +4,11 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Currency;
 import java.util.GregorianCalendar;
 
 import com.autovend.*;
-import com.autovend.devices.CardReader;
 import com.autovend.external.ProductDatabases;
 import com.autovend.software.ScanItems;
 import org.junit.*;
@@ -20,9 +18,7 @@ import org.junit.Test;
 import com.autovend.devices.SelfCheckoutStation;
 import com.autovend.devices.SimulationException;
 import com.autovend.external.CardIssuer;
-//import com.autovend.external.CardIssuer.CardRecord;
 import com.autovend.products.BarcodedProduct;
-import com.autovend.software.Pay;
 import com.autovend.software.PayWithCard;
 import com.autovend.software.PurchasedItems;
 
@@ -56,7 +52,6 @@ public class PayWithCardTest{
 	private double expectedBaggingWeight;
 	private ScanItems scanItems;
 	private PurchasedItems itemsPurchased;
-	private ArrayList<BarcodedProduct> itemList;
 	private boolean scanFailed1, scanFailed2, scanFailed3;
 
 	// initializing some barcodes to use during tests
@@ -74,18 +69,12 @@ public void setUp() {
 	int[] billDom = {5,10,20};
 	BigDecimal[] coinDom = {BigDecimal.valueOf(0.05), BigDecimal.valueOf(0.10),BigDecimal.valueOf(0.25)};
 	scs = new SelfCheckoutStation(currency, billDom, coinDom, 10000,2);
-	
 
-	//CreditCard Credit = new CreditCard("CREDIT","1234567890123456", "credit", "123", "1234", true, true);
-	//DebitCard Debit = new DebitCard("DEBIT","1234567890123456", "debit", "123", "1234", true, true);
-	PayWithCard PayWithDebit = new PayWithCard(scs,company);
-	PayWithCard PayWithCredit = new PayWithCard(scs,company);
-	//company.addCardData("1234567890123457","credit",exipery,"123",BigDecimal.valueOf(100));
+
 	company.addCardData("1234567890123458","debit",exipery,"123",BigDecimal.valueOf(100));
 
 	expectedCartPrice = new BigDecimal(0);
 	expectedBaggingWeight = 0.0;
-	itemList = new ArrayList<BarcodedProduct>();
 
 	// initialize a few prices
 	price1 = new BigDecimal(2.00);
@@ -142,9 +131,6 @@ public void setUp() {
 	scs.mainScanner.enable();
 	scs.handheldScanner.enable();
 	scs.handheldScanner.register(scanItems);
-
-
-
 	scs.baggingArea.register(scanItems);
 
 }
@@ -162,36 +148,26 @@ public void tearDown() {
 
 @Test
 public void testDebitTap() throws IOException {
-	//PayWithCard cardReaderss = new PayWithCard(scs, company);
+
 	PayWithCard PayWithDebit = new PayWithCard(scs,company);
 	scs.cardReader.register(PayWithDebit);
 	scs.mainScanner.scan(unitItem1);
 	scs.baggingArea.add(unitItem1);
-	
+
 	DebitCard Debit = new DebitCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);
 	company.addCardData("0234567890223451","DEBIT",exipery,"123",BigDecimal.valueOf(100));
 	scs.cardReader.tap(Debit);
-	//System.out.println(totalCost.getTotalPrice());
 
-	//BigDecimal test = PurchasedItems.getTotalPrice();
 	try {
 		PayWithDebit.pay(BigDecimal.valueOf(2.5));
-		//scs.cardReader.tap(Debit);
-		//System.out.println(PurchasedItems.getTotalPrice());
-		//System.out.println(PurchasedItems.getAmountLeftToPay());
-		//System.out.println(PurchasedItems.getAmountPaid());
 
-		//PayWithDebit.pay(milkPrice);
 	} catch (SimulationException e) {
 		e.printStackTrace();
- //   }catch (IOException e) {
 
 		// TODO Auto-generated catch block
 		e.printStackTrace();
 	}
-//		System.out.println(totalCost.getTotalPrice());
-		
-	
+
 	Assert.assertEquals(new BigDecimal(2.50), PurchasedItems.getAmountPaid());
 	}
 
