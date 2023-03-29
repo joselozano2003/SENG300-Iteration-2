@@ -19,7 +19,6 @@ public class PurchasedItems{
         totalPrice = new BigDecimal(0);
         amountPaid = new BigDecimal(0);
         totalExpectedWeight = 0;
-
         change = new BigDecimal(0);
     }
 

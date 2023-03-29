@@ -25,7 +25,7 @@ public abstract class Pay extends AbstractDevice<PayObserver> {
     public void pay(BigDecimal amountToPay) {
         PurchasedItems.addAmountPaid(amountToPay);
         BigDecimal amountPaid = PurchasedItems.getAmountPaid();
-    	if (amountPaid.compareTo(amountDue) >= 0) {
+    	if (amountPaid.equals(amountDue)) {
     		for (PayObserver observer : observers) {
     			observer.reactToSufficientPaymentEvent(this);
     		}
