@@ -123,14 +123,11 @@ public void setUp() {
 	maxScaleWeight = 10;
 	sensitivity = 1;
 
-	// create the station
-	selfCheckoutStation = new SelfCheckoutStation(currency, billDenominations, coinDenominations, maxScaleWeight, sensitivity);
-
 	// initialize purchased items constructor
 	itemsPurchased = new PurchasedItems();
 
 	// initialize constructor and add each product to the list of products being scanned
-	scanItems = new ScanItems(selfCheckoutStation, itemsPurchased);
+	scanItems = new ScanItems(scs);
 
 
 
@@ -164,11 +161,11 @@ public void tearDown() {
 
 @Test
 public void testDebitTap() throws IOException {
-	PayWithCard cardReaderss = new PayWithCard(scs,company);
+	PayWithCard cardReaderss = new PayWithCard(scs, company);
 	scs.cardReader.register(cardReaderss);
 	scs.mainScanner.scan(unitItem1);
 	scs.baggingArea.add(unitItem1);
-	DebitCard Debit = new DebitCard("DEBIT","1234567890123456", "debit", "123", "1234", true, true);
+	DebitCard Debit = new DebitCard("DEBIT", "1234567890123456", "debit", "123", "1234", true, true);
 
 	//System.out.println(totalCost.getTotalPrice());
 
@@ -178,19 +175,19 @@ public void testDebitTap() throws IOException {
 		System.out.println(PurchasedItems.getTotalPrice());
 		System.out.println(PurchasedItems.getAmountLeftToPay());
 		System.out.println(PurchasedItems.getAmountPaid());
-		
+
 //		PayWithDebit.pay(milkPrice);
-	} catch(SimulationException e)
-    {
-        e.printStackTrace();
+	} catch (SimulationException e) {
+		e.printStackTrace();
     }catch (IOException e) {
-		
+
 		// TODO Auto-generated catch block
 		e.printStackTrace();
 	}
-	//System.out.println(totalCost.getTotalPrice());
-	Assert.assertEquals(new BigDecimal(2.00), PurchasedItems.getAmountPaid());
-}
+//		System.out.println(totalCost.getTotalPrice());
+		Assert.assertEquals(new BigDecimal(2.00), PurchasedItems.getAmountPaid());
+	}
+
 
 @Test
 public void testDebitInsert() {

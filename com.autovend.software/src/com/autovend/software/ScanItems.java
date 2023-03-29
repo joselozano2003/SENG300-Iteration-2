@@ -27,7 +27,8 @@ public class ScanItems implements BarcodeScannerObserver, ElectronicScaleObserve
     /*
      * Constructor for ScanItems
      */
-    public ScanItems(SelfCheckoutStation station, PurchasedItems purchasedItems) {
+    public ScanItems(SelfCheckoutStation station) {
+        PurchasedItems purchasedItems = new PurchasedItems();
         this.selfCheckoutStation = station;
         this.purchaseList = purchasedItems;
     }

@@ -105,7 +105,7 @@ public class ScanItemsTest {
 		itemsPurchased = new PurchasedItems();
 		
 		// initialize constructor and add each product to the list of products being scanned
-		scanItems = new ScanItems(selfCheckoutStation, itemsPurchased);
+		scanItems = new ScanItems(selfCheckoutStation);
 		
 		//register the observer and enable scanners
 		selfCheckoutStation.mainScanner.register(scanItems);
