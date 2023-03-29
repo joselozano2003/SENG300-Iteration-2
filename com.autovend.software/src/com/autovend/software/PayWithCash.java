@@ -39,8 +39,9 @@ public class PayWithCash extends Pay implements BillDispenserObserver, BillValid
 	private Currency tempcurrency = Currency.getInstance("CAD");
 
 	
-    public PayWithCash(SelfCheckoutStation station, PurchasedItems items) {
-        super(station, items);
+    public PayWithCash(SelfCheckoutStation station) {
+        super(station);
+		PurchasedItems items = new PurchasedItems();
         if (amountToPay.compareTo(super.getAmountDue()) > 0) {
 			this.amountToPay = super.getAmountDue();
 		} else this.amountToPay = amountToPay;
@@ -71,14 +72,14 @@ public class PayWithCash extends Pay implements BillDispenserObserver, BillValid
     @Override
     public void reactToBillAddedEvent(BillDispenser dispenser, Bill bill) {
 
-    	station.billValidator.accept(bill);
+    	// station.billValidator.accept(bill);
     	
     }
 
     @Override
     public void reactToBillRemovedEvent(BillDispenser dispenser, Bill bill) {
     	
-    	station.billOutput.removeDanglingBill();
+    	// station.billOutput.removeDanglingBill();
 
     }
 

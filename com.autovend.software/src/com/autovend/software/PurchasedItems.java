@@ -57,11 +57,15 @@ public class PurchasedItems{
     }
 
 
-    public static void setAmountPaid(BigDecimal amount) {
-        amountPaid = amount;
+    public static void addAmountPaid(BigDecimal amount) {
+        amountPaid.add(amount);
     }
 
     public static BigDecimal getAmountPaid(){
         return amountPaid;
+    }
+
+    public static BigDecimal getAmountLeftToPay() {
+    	return totalPrice.subtract(amountPaid);
     }
 }

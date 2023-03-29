@@ -14,18 +14,20 @@ public class PayWithCard extends Pay implements CardReaderObserver {
 	
 	private BigDecimal amountToPay;
 	private CardIssuer cardIssuer;
+
 	
 	
-	public PayWithCard(SelfCheckoutStation station, PurchasedItems items, BigDecimal amountToPay, CardIssuer cardIssuer) {
-		super(station, items);
+	public PayWithCard(SelfCheckoutStation station, CardIssuer cardIssuer) {
+		super(station);
+		BigDecimal amountToPay = PurchasedItems.getAmountLeftToPay();
 		
-		if (amountToPay == null || cardIssuer == null) {
+		if (cardIssuer == null) {
             throw new SimulationException(new NullPointerException("No argument may be null."));
         }
 		
 		// Ensure that no change is produced when paying with card
-		if (amountToPay.compareTo(super.getAmountDue().subtract(super.getAmountPaid())) > 0) {
-			this.amountToPay = super.getAmountDue().subtract(super.getAmountPaid());
+		if (amountToPay.compareTo(super.getAmountDue().subtract(PurchasedItems.getAmountPaid())) > 0) {
+			this.amountToPay = super.getAmountDue().subtract(PurchasedItems.getAmountPaid());
 		} else this.amountToPay = amountToPay;
 		
 		this.cardIssuer = cardIssuer;
