@@ -1,6 +1,7 @@
 package com.autovend.software.test;
 import static org.junit.Assert.*;
 
+
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -143,7 +144,7 @@ public void setUp() {
 
 	//register the observers and enable card readers
 	// TODO: register the observers and enable card readers
-	//selfCheckoutStation.cardReader.register(cardReaders);
+	selfCheckoutStation.cardReader.register(cardReaders);
 
 
 
@@ -199,11 +200,59 @@ public void testDebitTap() throws IOException {
 	Assert.assertEquals(new BigDecimal(2.00), PurchasedItems.getAmountPaid());
 }
 
+@Test
+public void testDebitInsert() {
 
+}
 
+@Test
+public void testDebitSwipe() {
 
+}
 
+@Test
+public void testCreditTap() {
 
+}
+
+@Test
+public void testCreditInsert() {
+
+}
+
+@Test
+public void testCreditSwipe() {
+
+}
+
+@Test
+public void testDebitTapNotEnough() {
+
+}
+@Test
+public void testDebitInsertNotEnough() {
+
+}
+
+@Test
+public void testDebitSwipeNotEnough() {
+
+}
+
+@Test
+public void testCreditTapNotEnough() {
+
+}
+
+@Test
+public void testCreditInsertNotEnough() {
+
+}
+
+@Test
+public void testCreditSwipeNotEnough() {
+
+}
 
 
 
