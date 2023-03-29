@@ -13,6 +13,7 @@ public class PurchasedItems{
     private static double totalExpectedWeight;
     private static BigDecimal change;
     private static BigDecimal amountPaid;
+    private static boolean isPaid;
 
     static {
         listOfProducts = new ArrayList<>();
@@ -20,6 +21,7 @@ public class PurchasedItems{
         amountPaid = new BigDecimal(0);
         totalExpectedWeight = 0;
         change = new BigDecimal(0);
+        isPaid = false;
     }
 
     public static void addProduct(BarcodedProduct product){
@@ -58,6 +60,13 @@ public class PurchasedItems{
 
     public static void addAmountPaid(BigDecimal amount) {
         amountPaid.add(amount);
+        if (amountPaid.compareTo(totalPrice) >= 0) {
+        	isPaid = true;
+        }
+    }
+
+    public static boolean isPaid() {
+    	return isPaid;
     }
 
     public static BigDecimal getAmountPaid(){
