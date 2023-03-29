@@ -105,9 +105,9 @@ public class PayWithCash extends Pay implements BillDispenserObserver, BillValid
     @Override
     public void reactToValidBillDetectedEvent(BillValidator validator, Currency currency, int value) {
     	
-    	amountPaid = amountPaid.add(BigDecimal.valueOf(value));
+		PurchasedItems.addAmountPaid(new BigDecimal(value));
 
-    	if (amountPaid.compareTo(amountDue) > 0) {
+    	if (PurchasedItems.getAmountLeftToPay().compareTo(new BigDecimal(0)) > 0) {
     		for (int i : station.billDenominations) {
     			this.billValues.add(i);
     			this.billAmount.put(i, station.billDispensers.get(i).size());
@@ -132,9 +132,9 @@ public class PayWithCash extends Pay implements BillDispenserObserver, BillValid
 	@Override
 	public void reactToValidCoinDetectedEvent(CoinValidator validator, BigDecimal value) {
 		// TODO Auto-generated method stub
-		amountPaid = amountPaid.add(value);
+		PurchasedItems.addAmountPaid(value);
 
-		if (amountPaid.compareTo(amountDue) > 0) {
+		if (PurchasedItems.getAmountLeftToPay().compareTo(new BigDecimal(0)) > 0) {
     		for (int i : station.billDenominations) {
     			this.billValues.add(i);
     			this.billAmount.put(i, station.billDispensers.get(i).size());
