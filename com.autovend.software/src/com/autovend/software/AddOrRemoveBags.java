@@ -6,7 +6,7 @@ import java.util.*;
 import com.autovend.*;
 import com.autovend.devices.*;
 
-public class AddOrRemoveBags {
+public class AddOrRemoveBags extends AddItem{
 	public ArrayList<Bag> bags;
 	public int ownbags;
 	public int storebags;
