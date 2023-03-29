@@ -28,16 +28,11 @@ import com.autovend.software.PurchasedItems;
 
 public class PayWithCardTest{
 	
-	
-	
-	
-
 
 	private SelfCheckoutStation scs;
-	private BigDecimal amountToPay;
-	private CardIssuer companyIssue;
-	private CardReader cardReaders;
 	BigDecimal milkPrice = new BigDecimal(2.50);
+	BigDecimal amountToPay;
+	BigDecimal companyIssue;
     Numeral[] nMilk = {Numeral.one, Numeral.two, Numeral.three, Numeral.four};
     Barcode barcodeMilk = new Barcode(nMilk);
 	BarcodedProduct milk = new BarcodedProduct(barcodeMilk,"milk description",milkPrice,2.00);
@@ -139,24 +134,20 @@ public void setUp() {
 
 
 
-	cardReaders = new CardReader();
-
-
 	//register the observers and enable card readers
 	// TODO: register the observers and enable card readers
-	selfCheckoutStation.cardReader.register(cardReaders);
 
 
 
 	//register the observer and enable scanners
-	selfCheckoutStation.mainScanner.register(scanItems);
-	selfCheckoutStation.mainScanner.enable();
-	selfCheckoutStation.handheldScanner.enable();
-	selfCheckoutStation.handheldScanner.register(scanItems);
+	scs.mainScanner.register(scanItems);
+	scs.mainScanner.enable();
+	scs.handheldScanner.enable();
+	scs.handheldScanner.register(scanItems);
 
 
 
-	selfCheckoutStation.baggingArea.register(scanItems);
+	scs.baggingArea.register(scanItems);
 
 }
 	
@@ -173,10 +164,11 @@ public void tearDown() {
 
 @Test
 public void testDebitTap() throws IOException {
-	selfCheckoutStation.mainScanner.scan(unitItem1);
-	selfCheckoutStation.baggingArea.add(unitItem1);
+	PayWithCard cardReaderss = new PayWithCard(scs,company);
+	scs.cardReader.register(cardReaderss);
+	scs.mainScanner.scan(unitItem1);
+	scs.baggingArea.add(unitItem1);
 	DebitCard Debit = new DebitCard("DEBIT","1234567890123456", "debit", "123", "1234", true, true);
-	PayWithCard PayWithDebit = new PayWithCard(scs,company);
 
 	//System.out.println(totalCost.getTotalPrice());
 
