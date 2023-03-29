@@ -22,11 +22,7 @@ public abstract class Pay extends AbstractDevice<PayObserver> {
         amountDue = PurchasedItems.getAmountLeftToPay();
     }
 
-    /**
-     * Updates amountPaid and creates a reactToSufficientPaymentEvent if payment is sufficient to cover the bill
-     * @param amountToPay
-     */
-    protected void Pay(BigDecimal amountToPay) {
+    public void pay(BigDecimal amountToPay) {
         PurchasedItems.addAmountPaid(amountToPay);
         BigDecimal amountPaid = PurchasedItems.getAmountPaid();
     	if (amountPaid.compareTo(amountDue) >= 0) {

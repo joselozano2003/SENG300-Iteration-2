@@ -3,6 +3,7 @@ package com.autovend.software;
 import java.math.BigDecimal;
 import java.util.Currency;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -37,16 +38,24 @@ public class PayWithCash extends Pay implements BillDispenserObserver, BillValid
 	private Bill bill;
 	private Coin coin;
 	private Currency tempcurrency = Currency.getInstance("CAD");
+	private List<Integer> billValues;
+	private List<BigDecimal> coinValues;
+	private Map<Integer, Integer> billAmount = new HashMap<Integer, Integer>();
+	private Map<BigDecimal, Integer> coinAmount = new HashMap<BigDecimal, Integer>();
 
-	
+	// If there is a change, sum up all bills+coins and send to dp
+	// paid == due -> Disable/sth
+
+
     public PayWithCash(SelfCheckoutStation station) {
         super(station);
 		PurchasedItems items = new PurchasedItems();
+		/*
         if (amountToPay.compareTo(super.getAmountDue()) > 0) {
 			this.amountToPay = super.getAmountDue();
 		} else this.amountToPay = amountToPay;
         this.billDispenser = billDispenser;
-        this.coinDispenser = coinDispenser;
+        this.coinDispenser = coinDispenser;*/
     }
 
     @Override
@@ -96,25 +105,21 @@ public class PayWithCash extends Pay implements BillDispenserObserver, BillValid
     @Override
     public void reactToValidBillDetectedEvent(BillValidator validator, Currency currency, int value) {
     	
-    	amountToPay = amountToPay.subtract(BigDecimal.valueOf(value));
-    	// While the amount to pay is >0, in other words, it is needed to provide changes:
-    	while (amountToPay.compareTo(new BigDecimal(0.00)) < -5) {
-    		// I want to loop from the largest one but don't know how to sort the hashmap tbh
-    		for (Map.Entry<Integer, BillDispenser> entry : this.station.billDispensers.entrySet()) {
-    			bill = new Bill(entry.getKey(), currency);
-    			try {
-					entry.getValue().emit();
-				} catch (DisabledException | EmptyException | OverloadException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+    	amountPaid = amountPaid.add(BigDecimal.valueOf(value));
+
+    	if (amountPaid.compareTo(amountDue) > 0) {
+    		for (int i : station.billDenominations) {
+    			this.billValues.add(i);
+    			this.billAmount.put(i, station.billDispensers.get(i).size());
+    		}
+
+    		for (BigDecimal i : station.coinDenominations) {
+    			this.coinValues.add(i);
+    			this.coinAmount.put(i, station.coinDispensers.get(i).size());
     		}
     	}
-    	// If the changes left is smaller than 5, then use coins
-    	if (amountToPay.compareTo(new BigDecimal(0.00)) < 0 && amountToPay.compareTo(new BigDecimal(0.00)) > -5) {
-    		CoinValidator tempValidator = null;
-    		reactToValidCoinDetectedEvent(tempValidator, new BigDecimal(0.00));
-    	}
+
+    	// Then pass to dp by Vic to see if we have enough change and emit
 
     }
 
@@ -123,29 +128,45 @@ public class PayWithCash extends Pay implements BillDispenserObserver, BillValid
 
     }
 
-    void pay() {
-
-    }
 
 	@Override
 	public void reactToValidCoinDetectedEvent(CoinValidator validator, BigDecimal value) {
 		// TODO Auto-generated method stub
-		amountToPay = amountToPay.subtract(value);
-		// While the amount to pay is >0, in other words, it is needed to provide changes:
-    	while (amountToPay.compareTo(new BigDecimal(0.00)) < 0) {
-    		// I want to loop from the largest one but don't know how to sort the hashmap tbh
-    		for (Entry<BigDecimal, CoinDispenser> entry : this.station.coinDispensers.entrySet()) {
-    			//coin = new Coin(entry.getKey(), "CAD");
-    			coin = new Coin(entry.getKey(), tempcurrency);
-    			try {
-					entry.getValue().emit();
-				} catch (DisabledException | EmptyException | OverloadException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+		amountPaid = amountPaid.add(value);
+
+		if (amountPaid.compareTo(amountDue) > 0) {
+    		for (int i : station.billDenominations) {
+    			this.billValues.add(i);
+    			this.billAmount.put(i, station.billDispensers.get(i).size());
+    		}
+
+    		for (BigDecimal i : station.coinDenominations) {
+    			this.coinValues.add(i);
+    			this.coinAmount.put(i, station.coinDispensers.get(i).size());
     		}
     	}
-    	
+
+
+		// Then pass to dp by Vic to see if we have enough change and emit
+
+
+//		// While the amount to pay is >0, in other words, it is needed to provide changes:
+//    	while (amountPaid.compareTo(amountDue) > 0) {
+//    		// I want to loop from the largest one but don't know how to sort the hashmap tbh
+//    		for (Entry<BigDecimal, CoinDispenser> entry : this.station.coinDispensers.entrySet()) {
+//    			//coin = new Coin(entry.getKey(), "CAD");
+//    			coin = new Coin(entry.getKey(), tempcurrency);
+//    			try {
+//					entry.getValue().emit();
+//					// changes sth to amountDue/amountPaid to avoid infinite loop
+//					// amountDue = amountDue.subtract(BigDecimal.valueOf(entry.getKey()));
+//				} catch (DisabledException | EmptyException | OverloadException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//    		}
+//    	}
+
 	}
 
 	@Override
