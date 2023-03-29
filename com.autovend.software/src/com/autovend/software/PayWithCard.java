@@ -70,7 +70,7 @@ public class PayWithCard extends Pay implements CardReaderObserver {
 	}
 	
 	public void reactToCardDataReadEvent(CardReader reader, CardData data) {
-		int holdNumber = cardIssuer.authorizeHold(data.getNumber(), amountToPay); 						  	// Contact card issuer and attempt to place a hold
+		int holdNumber = cardIssuer.authorizeHold(data.getNumber(), PurchasedItems.getAmountLeftToPay()); 						  	// Contact card issuer and attempt to place a hold
 		if (holdNumber == -1) return; 																		// Return if hold is unable to be placed
 		boolean transactionPosted = cardIssuer.postTransaction(data.getNumber(), holdNumber, amountToPay); 	// Contact card issuer to attempt to post transaction
 		if (transactionPosted) super.pay(amountToPay); 														// If transaction is posted, pay the amount

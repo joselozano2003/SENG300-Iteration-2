@@ -63,7 +63,7 @@ public class PurchasedItems{
 
 
     public static void addAmountPaid(BigDecimal amount) {
-        amountPaid.add(amount);
+        amountPaid = amountPaid.add(amount);
         if (amountPaid.compareTo(totalPrice) >= 0) {
         	isPaid = true;
         }
