@@ -246,5 +246,15 @@ public class ScanItemsTest {
 		Assert.assertEquals(itemProduct1, itemsPurchased.getListOfProducts().get(0));
 		Assert.assertEquals(itemProduct2, itemsPurchased.getListOfProducts().get(1));
 	}
+	
+	@Test
+	public void paidFullyItShouldNotLetYouAddMore() {
+		
+	}
+	
+	@Test
+	public void paidPartiallyItShouldLetYouAddMore() {
+		
+	}
 
 }
