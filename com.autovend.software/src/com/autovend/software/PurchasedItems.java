@@ -28,6 +28,9 @@ public class PurchasedItems{
         listOfProducts.add(product);
         totalPrice = totalPrice.add(product.getPrice());
         totalExpectedWeight += product.getExpectedWeight();
+        if (totalPrice.compareTo(amountPaid) >= 0) {
+            isPaid = false;
+        }
     }
 
     public static ArrayList<BarcodedProduct> getListOfProducts(){
