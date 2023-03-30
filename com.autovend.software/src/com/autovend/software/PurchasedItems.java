@@ -63,7 +63,7 @@ public class PurchasedItems{
 
 
     public static void addAmountPaid(BigDecimal amount) {
-        amountPaid.add(amount);
+        amountPaid = amountPaid.add(amount);
         if (amountPaid.compareTo(totalPrice) >= 0) {
         	isPaid = true;
         }
@@ -83,10 +83,19 @@ public class PurchasedItems{
 
 
     // This method is used for testing purposes ONLY for scanItemsTest
-    public void setAmountPaid(BigDecimal amount) {
+    public static void setAmountPaid(BigDecimal amount) {
     	amountPaid = amount;
         if (amountPaid.compareTo(totalPrice) >= 0) {
             isPaid = true;
         }
+    }
+
+    public static void reset() {
+    	listOfProducts = new ArrayList<>();
+        totalPrice = new BigDecimal(0);
+        amountPaid = new BigDecimal(0);
+        totalExpectedWeight = 0;
+        change = new BigDecimal(0);
+        isPaid = false;
     }
 }

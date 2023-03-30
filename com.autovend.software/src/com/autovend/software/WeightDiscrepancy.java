@@ -1,7 +1,27 @@
-public class WeightDiscrepancy implements ElectronicScaleObserver{
-    private selfCheckoutStation selfCheckoutStation;
+package com.autovend.software;
 
-    public WeightDiscrepancy(selfCheckoutStation selfCheckoutStation)
+import java.math.BigDecimal;
+import java.util.Currency;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import com.autovend.Bill;
+import com.autovend.Coin;
+import com.autovend.devices.*;
+import com.autovend.devices.observers.AbstractDeviceObserver;
+import com.autovend.devices.observers.BillDispenserObserver;
+import com.autovend.devices.observers.BillValidatorObserver;
+import com.autovend.devices.observers.CoinDispenserObserver;
+import com.autovend.devices.observers.CoinValidatorObserver;
+import com.autovend.devices.observers.ElectronicScaleObserver;
+import com.autovend.devices.SelfCheckoutStation;
+
+public class WeightDiscrepancy implements ElectronicScaleObserver{
+    private SelfCheckoutStation selfCheckoutStation;
+
+    public WeightDiscrepancy(SelfCheckoutStation selfCheckoutStation)
     {
         this.selfCheckoutStation = selfCheckoutStation;
         selfCheckoutStation.baggingArea.register(this);

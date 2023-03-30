@@ -4,13 +4,11 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Currency;
 import java.util.GregorianCalendar;
 
 import com.autovend.*;
-import com.autovend.devices.CardReader;
 import com.autovend.external.ProductDatabases;
 import com.autovend.software.ScanItems;
 import org.junit.*;
@@ -20,24 +18,17 @@ import org.junit.Test;
 import com.autovend.devices.SelfCheckoutStation;
 import com.autovend.devices.SimulationException;
 import com.autovend.external.CardIssuer;
-//import com.autovend.external.CardIssuer.CardRecord;
 import com.autovend.products.BarcodedProduct;
-import com.autovend.software.Pay;
 import com.autovend.software.PayWithCard;
 import com.autovend.software.PurchasedItems;
 
 public class PayWithCardTest{
 	
-	
-	
-	
-
 
 	private SelfCheckoutStation scs;
-	private BigDecimal amountToPay;
-	private CardIssuer companyIssue;
-	private CardReader cardReaders;
 	BigDecimal milkPrice = new BigDecimal(2.50);
+	BigDecimal amountToPay;
+	BigDecimal companyIssue;
     Numeral[] nMilk = {Numeral.one, Numeral.two, Numeral.three, Numeral.four};
     Barcode barcodeMilk = new Barcode(nMilk);
 	BarcodedProduct milk = new BarcodedProduct(barcodeMilk,"milk description",milkPrice,2.00);
@@ -45,6 +36,7 @@ public class PayWithCardTest{
 	
 	Calendar exipery = new GregorianCalendar(2025, Calendar.OCTOBER, 31);
 	CardIssuer company = new CardIssuer("TD");
+	CardIssuer company2 = new CardIssuer("BMO");
 
 	Currency currency = Currency.getInstance("CAD");
 	int[] billDenominations = {1, 2, 5, 10};
@@ -60,7 +52,6 @@ public class PayWithCardTest{
 	private double expectedBaggingWeight;
 	private ScanItems scanItems;
 	private PurchasedItems itemsPurchased;
-	private ArrayList<BarcodedProduct> itemList;
 	private boolean scanFailed1, scanFailed2, scanFailed3;
 
 	// initializing some barcodes to use during tests
@@ -78,18 +69,12 @@ public void setUp() {
 	int[] billDom = {5,10,20};
 	BigDecimal[] coinDom = {BigDecimal.valueOf(0.05), BigDecimal.valueOf(0.10),BigDecimal.valueOf(0.25)};
 	scs = new SelfCheckoutStation(currency, billDom, coinDom, 10000,2);
-	
 
-	CreditCard Credit = new CreditCard("CREDIT","1234567890123456", "credit", "123", "1234", true, true);
-	DebitCard Debit = new DebitCard("DEBIT","1234567890123456", "debit", "123", "1234", true, true);
-	PayWithCard PayWithDebit = new PayWithCard(scs,company);
-	PayWithCard PayWithCredit = new PayWithCard(scs,company);
-	company.addCardData("1234567890123457","credit",exipery,"123",BigDecimal.valueOf(100));
+
 	company.addCardData("1234567890123458","debit",exipery,"123",BigDecimal.valueOf(100));
 
 	expectedCartPrice = new BigDecimal(0);
 	expectedBaggingWeight = 0.0;
-	itemList = new ArrayList<BarcodedProduct>();
 
 	// initialize a few prices
 	price1 = new BigDecimal(2.00);
@@ -128,35 +113,25 @@ public void setUp() {
 	maxScaleWeight = 10;
 	sensitivity = 1;
 
-	// create the station
-	selfCheckoutStation = new SelfCheckoutStation(currency, billDenominations, coinDenominations, maxScaleWeight, sensitivity);
-
 	// initialize purchased items constructor
 	itemsPurchased = new PurchasedItems();
 
 	// initialize constructor and add each product to the list of products being scanned
-	scanItems = new ScanItems(selfCheckoutStation, itemsPurchased);
+	scanItems = new ScanItems(scs);
 
-
-
-	cardReaders = new CardReader();
 
 
 	//register the observers and enable card readers
 	// TODO: register the observers and enable card readers
-	selfCheckoutStation.cardReader.register(cardReaders);
 
 
 
 	//register the observer and enable scanners
-	selfCheckoutStation.mainScanner.register(scanItems);
-	selfCheckoutStation.mainScanner.enable();
-	selfCheckoutStation.handheldScanner.enable();
-	selfCheckoutStation.handheldScanner.register(scanItems);
-
-
-
-	selfCheckoutStation.baggingArea.register(scanItems);
+	scs.mainScanner.register(scanItems);
+	scs.mainScanner.enable();
+	scs.handheldScanner.enable();
+	scs.handheldScanner.register(scanItems);
+	scs.baggingArea.register(scanItems);
 
 }
 	
@@ -168,47 +143,118 @@ public void tearDown() {
 	amountToPay = null;
 	companyIssue = null;
 	exipery = null;
+	PurchasedItems.reset();
 }
 
 
 @Test
 public void testDebitTap() throws IOException {
-	selfCheckoutStation.mainScanner.scan(unitItem1);
-	selfCheckoutStation.baggingArea.add(unitItem1);
-	DebitCard Debit = new DebitCard("DEBIT","1234567890123456", "debit", "123", "1234", true, true);
+
 	PayWithCard PayWithDebit = new PayWithCard(scs,company);
+	scs.cardReader.register(PayWithDebit);
+	scs.mainScanner.scan(unitItem1);
+	scs.baggingArea.add(unitItem1);
 
-	//System.out.println(totalCost.getTotalPrice());
+	DebitCard Debit = new DebitCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);
+	company.addCardData("0234567890223451","DEBIT",exipery,"123",BigDecimal.valueOf(100));
 
-	BigDecimal test = PurchasedItems.getTotalPrice();
+
 	try {
 		scs.cardReader.tap(Debit);
-		System.out.println(PurchasedItems.getTotalPrice());
-		System.out.println(PurchasedItems.getAmountLeftToPay());
-		System.out.println(PurchasedItems.getAmountPaid());
-		
-//		PayWithDebit.pay(milkPrice);
-	} catch(SimulationException e)
-    {
-        e.printStackTrace();
-    }catch (IOException e) {
-		
+	} catch (SimulationException e) {
+		e.printStackTrace();
+
 		// TODO Auto-generated catch block
 		e.printStackTrace();
 	}
-	//System.out.println(totalCost.getTotalPrice());
-	Assert.assertEquals(new BigDecimal(2.00), PurchasedItems.getAmountPaid());
+
+	Assert.assertEquals(new BigDecimal(2), PurchasedItems.getAmountPaid());
+	}
+
+
+@Test
+public void testDebitInsert() throws IOException {
+	
+	PayWithCard PayWithDebit = new PayWithCard(scs,company);
+	scs.cardReader.register(PayWithDebit);
+	scs.mainScanner.scan(unitItem1);
+	scs.baggingArea.add(unitItem1);
+
+	DebitCard Debit = new DebitCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);
+	company.addCardData("0234567890223451","DEBIT",exipery,"123",BigDecimal.valueOf(100));
+
+
+	try {
+		scs.cardReader.insert(Debit,"1234");
+	} catch (SimulationException e) {
+		e.printStackTrace();
+
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+
+	Assert.assertEquals(new BigDecimal(2), PurchasedItems.getAmountPaid());
+}
+
+
+
+@Test
+public void testDebitSwipe() throws IOException {
+	PayWithCard PayWithDebit = new PayWithCard(scs,company);
+	scs.cardReader.register(PayWithDebit);
+	scs.mainScanner.scan(unitItem1);
+	scs.baggingArea.add(unitItem1);
+
+	DebitCard Debit = new DebitCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);
+	company.addCardData("0234567890223451","DEBIT",exipery,"123",BigDecimal.valueOf(100));
+
+	try {
+		scs.cardReader.swipe(Debit,null);
+	} catch (SimulationException e) {
+		e.printStackTrace();
+
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+
+	Assert.assertEquals(new BigDecimal(2), PurchasedItems.getAmountPaid());
 }
 
 @Test
-public void testDebitInsert() {
+public void testDebitTapNotEnough() throws IOException {
+	PayWithCard PayWithDebit = new PayWithCard(scs,company);
+	scs.cardReader.register(PayWithDebit);
+	scs.mainScanner.scan(unitItem1);
+	scs.baggingArea.add(unitItem1);
+
+	DebitCard Debit = new DebitCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);
+	company.addCardData("0234567890223451","DEBIT",exipery,"123",BigDecimal.valueOf(1));
+
+
+	try {
+		scs.cardReader.swipe(Debit,null);
+	} catch (SimulationException e) {
+		e.printStackTrace();
+
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+
+	Assert.assertEquals(new BigDecimal(2), PurchasedItems.getAmountLeftToPay());
+	Assert.assertEquals(new BigDecimal(0), PurchasedItems.getAmountPaid());
+}
+
+
+@Test
+public void testDebitInsertNotEnough() {
 
 }
 
 @Test
-public void testDebitSwipe() {
+public void testDebitSwipeNotEnough() {
 
 }
+
 
 @Test
 public void testCreditTap() {
@@ -225,19 +271,7 @@ public void testCreditSwipe() {
 
 }
 
-@Test
-public void testDebitTapNotEnough() {
 
-}
-@Test
-public void testDebitInsertNotEnough() {
-
-}
-
-@Test
-public void testDebitSwipeNotEnough() {
-
-}
 
 @Test
 public void testCreditTapNotEnough() {

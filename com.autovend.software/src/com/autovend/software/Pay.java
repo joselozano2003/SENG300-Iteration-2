@@ -33,6 +33,6 @@ public abstract class Pay extends AbstractDevice<PayObserver> {
     }
 
     public BigDecimal getAmountDue() {
-        return amountDue;
+        return PurchasedItems.getAmountLeftToPay();
     }
 }
