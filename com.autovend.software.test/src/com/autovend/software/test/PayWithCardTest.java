@@ -14,6 +14,17 @@
  * Robert (William) Engel (30119608)
  */
 
+/*
+ * Testing for PayWithCredit and PayWithDebit, specifically, when paying with tap, insert and swipe
+ * the test can all pass, but because of the hardwares randomize fail feature, such as magnetic strip
+ * not working the test will fail, but all test are able to pass. if running the tests for the first time
+ * and all of them do not pass, please keep running them until all of them pass, this mainly due to the given 
+ * hardwares randomness as mentioned above. 
+ * 
+ * The testing for insufficient balance or credit the asserts are to assure that nothing changes and the card provider 
+ * should negate the request
+ */
+
 package com.autovend.software.test;
 import static org.junit.Assert.*;
 
@@ -162,7 +173,9 @@ public void tearDown() {
 	PurchasedItems.reset();
 }
 
-//Test for Debit tap
+/*
+ * tests if paying with debit card tap works with sufficient balance
+ */
 @Test
 public void testDebitTap() throws IOException {
 
@@ -187,7 +200,9 @@ public void testDebitTap() throws IOException {
 	Assert.assertEquals(new BigDecimal(2), PurchasedItems.getAmountPaid());
 	}
 
-//test for debit insert
+/*
+ * tests if paying with debit card insert works with sufficient balance and valid pin
+ */
 @Test
 public void testDebitInsert() throws IOException {
 	
@@ -211,8 +226,10 @@ public void testDebitInsert() throws IOException {
 
 	Assert.assertEquals(new BigDecimal(2), PurchasedItems.getAmountPaid());
 }
-
-@Test
+/*
+ * tests if paying with debit card insert throws InvalidPINException when invalid pin present
+ */
+@Test(expected = InvalidPINException.class)
 public void testDebitInsertWrongPin() throws IOException {
 	PayWithCard PayWithDebit = new PayWithCard(scs,company);
 	scs.cardReader.register(PayWithDebit);
@@ -221,18 +238,14 @@ public void testDebitInsertWrongPin() throws IOException {
 
 	DebitCard Debit = new DebitCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);
 	company.addCardData("0234567890223451","DEBIT",exipery,"123",BigDecimal.valueOf(100));
-
-	try {
-		scs.cardReader.insert(Debit, "12345");
-	} catch (InvalidPINException e) {
-		e.printStackTrace();
-
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
+	scs.cardReader.insert(Debit, "12345");
 }
+		
 
-//test for debit swipe
+
+/*
+ * tests if paying with debit card swipe works with sufficient balance
+ */
 @Test
 public void testDebitSwipe() throws IOException {
 	PayWithCard PayWithDebit = new PayWithCard(scs,company);
@@ -255,7 +268,9 @@ public void testDebitSwipe() throws IOException {
 	Assert.assertEquals(new BigDecimal(2), PurchasedItems.getAmountPaid());
 }
 
-//debit trying to buy something but does not have enough
+/*
+ * tests if paying with debit card tap does not works with insufficient balance
+ */
 @Test
 public void testDebitTapNotEnough() throws IOException {
 	PayWithCard PayWithDebit = new PayWithCard(scs,company);
@@ -281,7 +296,9 @@ public void testDebitTapNotEnough() throws IOException {
 	
 }
 
-//debit inserting but not enough
+/*
+ * tests if paying with debit card insert does not works with insufficient balance
+ */
 @Test
 public void testDebitInsertNotEnough() throws IOException {
 	PayWithCard PayWithDebit = new PayWithCard(scs,company);
@@ -307,7 +324,9 @@ public void testDebitInsertNotEnough() throws IOException {
 	
 }
 
-//debit swiping but not enough money
+/*
+ * tests if paying with debit card swipe does not works with insufficient balance
+ */
 @Test
 public void testDebitSwipeNotEnough() throws IOException {
 	PayWithCard PayWithDebit = new PayWithCard(scs,company);
@@ -334,7 +353,9 @@ public void testDebitSwipeNotEnough() throws IOException {
 }
 
 
-//credit card tapping
+/*
+ * tests if paying with credit card tap works with enough credit
+ */
 @Test
 public void testCreditTap() throws IOException {
 	PayWithCard PayWithCredit = new PayWithCard(scs,company);
@@ -357,8 +378,10 @@ public void testCreditTap() throws IOException {
 
 	Assert.assertEquals(new BigDecimal(2), PurchasedItems.getAmountPaid());
 }
-
-@Test
+/*
+ * tests if paying with credit card insert works with enough credit and valid pin
+ */
+@Test 
 public void testCreditInsert() throws IOException {
 	PayWithCard PayWithCredit = new PayWithCard(scs,company);
 	scs.cardReader.register(PayWithCredit);
@@ -381,8 +404,10 @@ public void testCreditInsert() throws IOException {
 	Assert.assertEquals(new BigDecimal(2), PurchasedItems.getAmountPaid());
 }
 
-
-@Test
+/*
+ * tests if paying with credit card insert throws InvalidPINException when invalid pin present
+ */
+@Test (expected = InvalidPINException.class)
 public void testCreditInsertWrongPin() throws IOException {
 	PayWithCard PayWithCredit = new PayWithCard(scs,company);
 	scs.cardReader.register(PayWithCredit);
@@ -392,17 +417,13 @@ public void testCreditInsertWrongPin() throws IOException {
 	CreditCard Credit = new CreditCard("Credit", "0234567890223451", "credit", "123", "1234", true, true);
 	company.addCardData("0234567890223451","Credit",exipery,"123",BigDecimal.valueOf(100));
 
-
-	try {
-		scs.cardReader.insert(Credit, "12345");
-	} catch (InvalidPINException e) {
-		e.printStackTrace();
-
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
+	scs.cardReader.insert(Credit, "12345");
+	
 }
 
+/*
+ * tests if paying with credit card swipe works with enough credit
+ */
 @Test
 public void testCreditSwipe() throws IOException {
 	PayWithCard PayWithCredit = new PayWithCard(scs,company);
@@ -427,7 +448,9 @@ public void testCreditSwipe() throws IOException {
 }
 
 
-
+/*
+ * tests if paying with credit card tap does not works with not enough credit
+ */
 @Test
 public void testCreditTapNotEnough() throws IOException {
 	PayWithCard PayWithCredit = new PayWithCard(scs,company);
@@ -453,6 +476,9 @@ public void testCreditTapNotEnough() throws IOException {
 	
 }
 
+/*
+ * tests if paying with credit card insert does not works with not enough credit
+ */
 @Test
 public void testCreditInsertNotEnough() throws IOException {
 	PayWithCard PayWithCredit = new PayWithCard(scs,company);
@@ -477,6 +503,9 @@ public void testCreditInsertNotEnough() throws IOException {
 	Assert.assertEquals(new BigDecimal(0), PurchasedItems.getAmountPaid());
 }
 
+/*
+ * tests if paying with credit card swipe does not works with not enough credit
+ */
 @Test
 public void testCreditSwipeNotEnough() throws IOException {
 	PayWithCard PayWithCredit = new PayWithCard(scs,company);
