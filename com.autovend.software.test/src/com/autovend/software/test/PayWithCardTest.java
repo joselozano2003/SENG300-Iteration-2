@@ -184,12 +184,12 @@ public void testDebitTap() throws IOException {
 	scs.mainScanner.scan(unitItem1);
 	scs.baggingArea.add(unitItem1);
 
-	DebitCard Debit = new DebitCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);
+	DebitCard DebitTap = new DebitCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);
 	company.addCardData("0234567890223451","DEBIT",exipery,"123",BigDecimal.valueOf(100));
 
 
 	try {
-		scs.cardReader.tap(Debit);
+		scs.cardReader.tap(DebitTap);
 	} catch (SimulationException e) {
 		e.printStackTrace();
 
@@ -211,12 +211,12 @@ public void testDebitInsert() throws IOException {
 	scs.mainScanner.scan(unitItem1);
 	scs.baggingArea.add(unitItem1);
 
-	DebitCard Debit = new DebitCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);
+	DebitCard DebitInsert = new DebitCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);
 	company.addCardData("0234567890223451","DEBIT",exipery,"123",BigDecimal.valueOf(100));
 
 
 	try {
-		scs.cardReader.insert(Debit,"1234");
+		scs.cardReader.insert(DebitInsert,"1234");
 	} catch (SimulationException e) {
 		e.printStackTrace();
 
@@ -236,9 +236,9 @@ public void testDebitInsertWrongPin() throws IOException {
 	scs.mainScanner.scan(unitItem1);
 	scs.baggingArea.add(unitItem1);
 
-	DebitCard Debit = new DebitCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);
+	DebitCard DebitWrong = new DebitCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);
 	company.addCardData("0234567890223451","DEBIT",exipery,"123",BigDecimal.valueOf(100));
-	scs.cardReader.insert(Debit, "12345");
+	scs.cardReader.insert(DebitWrong, "12345");
 }
 		
 
@@ -253,11 +253,11 @@ public void testDebitSwipe() throws IOException {
 	scs.mainScanner.scan(unitItem1);
 	scs.baggingArea.add(unitItem1);
 
-	DebitCard Debit = new DebitCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);
+	DebitCard DebitSwipe = new DebitCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);
 	company.addCardData("0234567890223451","DEBIT",exipery,"123",BigDecimal.valueOf(100));
 
 	try {
-		scs.cardReader.swipe(Debit,null);
+		scs.cardReader.swipe(DebitSwipe,null);
 	} catch (SimulationException e) {
 		e.printStackTrace();
 
@@ -278,12 +278,12 @@ public void testDebitTapNotEnough() throws IOException {
 	scs.mainScanner.scan(unitItem1);
 	scs.baggingArea.add(unitItem1);
 
-	DebitCard Debit = new DebitCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);
+	DebitCard DebitTapWrong = new DebitCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);
 	company.addCardData("0234567890223451","DEBIT",exipery,"123",BigDecimal.valueOf(1));
 
 
 	try {
-		scs.cardReader.tap(Debit);
+		scs.cardReader.tap(DebitTapWrong);
 	} catch (SimulationException e) {
 		e.printStackTrace();
 
@@ -306,12 +306,12 @@ public void testDebitInsertNotEnough() throws IOException {
 	scs.mainScanner.scan(unitItem1);
 	scs.baggingArea.add(unitItem1);
 
-	DebitCard Debit = new DebitCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);
+	DebitCard DebitInsertWrong = new DebitCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);
 	company.addCardData("0234567890223451","DEBIT",exipery,"123",BigDecimal.valueOf(1));
 
 
 	try {
-		scs.cardReader.insert(Debit,"1234");
+		scs.cardReader.insert(DebitInsertWrong,"1234");
 	} catch (SimulationException e) {
 		e.printStackTrace();
 
@@ -334,12 +334,12 @@ public void testDebitSwipeNotEnough() throws IOException {
 	scs.mainScanner.scan(unitItem1);
 	scs.baggingArea.add(unitItem1);
 
-	DebitCard Debit = new DebitCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);
+	DebitCard Debit1 = new DebitCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);
 	company.addCardData("0234567890223451","DEBIT",exipery,"123",BigDecimal.valueOf(1));
 
 
 	try {
-		scs.cardReader.swipe(Debit, null);
+		scs.cardReader.swipe(Debit1, null);
 	} catch (SimulationException e) {
 		e.printStackTrace();
 
@@ -363,12 +363,12 @@ public void testCreditTap() throws IOException {
 	scs.mainScanner.scan(unitItem1);
 	scs.baggingArea.add(unitItem1);
 
-	CreditCard Credit = new CreditCard("Credit", "0234567890223451", "credit", "123", "1234", true, true);
+	CreditCard CreditTap = new CreditCard("Credit", "0234567890223451", "credit", "123", "1234", true, true);
 	company.addCardData("0234567890223451","Credit",exipery,"123",BigDecimal.valueOf(100));
 
 
 	try {
-		scs.cardReader.tap(Credit);
+		scs.cardReader.tap(CreditTap);
 	} catch (SimulationException e) {
 		e.printStackTrace();
 
@@ -388,12 +388,12 @@ public void testCreditInsert() throws IOException {
 	scs.mainScanner.scan(unitItem1);
 	scs.baggingArea.add(unitItem1);
 
-	CreditCard Credit = new CreditCard("Credit", "0234567890223451", "credit", "123", "1234", true, true);
+	CreditCard CreditInsert = new CreditCard("Credit", "0234567890223451", "credit", "123", "1234", true, true);
 	company.addCardData("0234567890223451","Credit",exipery,"123",BigDecimal.valueOf(100));
 
 
 	try {
-		scs.cardReader.insert(Credit, "1234");
+		scs.cardReader.insert(CreditInsert, "1234");
 	} catch (SimulationException e) {
 		e.printStackTrace();
 
@@ -414,10 +414,10 @@ public void testCreditInsertWrongPin() throws IOException {
 	scs.mainScanner.scan(unitItem1);
 	scs.baggingArea.add(unitItem1);
 
-	CreditCard Credit = new CreditCard("Credit", "0234567890223451", "credit", "123", "1234", true, true);
+	CreditCard CreditWrong = new CreditCard("Credit", "0234567890223451", "credit", "123", "1234", true, true);
 	company.addCardData("0234567890223451","Credit",exipery,"123",BigDecimal.valueOf(100));
 
-	scs.cardReader.insert(Credit, "12345");
+	scs.cardReader.insert(CreditWrong, "12345");
 	
 }
 
@@ -431,12 +431,12 @@ public void testCreditSwipe() throws IOException {
 	scs.mainScanner.scan(unitItem1);
 	scs.baggingArea.add(unitItem1);
 
-	CreditCard Credit = new CreditCard("Credit", "0234567890223451", "credit", "123", "1234", true, true);
+	CreditCard CreditSwipe = new CreditCard("Credit", "0234567890223451", "credit", "123", "1234", true, true);
 	company.addCardData("0234567890223451","Credit",exipery,"123",BigDecimal.valueOf(100));
 
 
 	try {
-		scs.cardReader.swipe(Credit, null);
+		scs.cardReader.swipe(CreditSwipe, null);
 	} catch (SimulationException e) {
 		e.printStackTrace();
 
@@ -458,12 +458,12 @@ public void testCreditTapNotEnough() throws IOException {
 	scs.mainScanner.scan(unitItem1);
 	scs.baggingArea.add(unitItem1);
 
-	CreditCard Credit = new CreditCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);
+	CreditCard Credit1 = new CreditCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);
 	company.addCardData("0234567890223451","DEBIT",exipery,"123",BigDecimal.valueOf(1));
 
 
 	try {
-		scs.cardReader.tap(Credit);
+		scs.cardReader.tap(Credit1);
 	} catch (SimulationException e) {
 		e.printStackTrace();
 
@@ -486,12 +486,12 @@ public void testCreditInsertNotEnough() throws IOException {
 	scs.mainScanner.scan(unitItem1);
 	scs.baggingArea.add(unitItem1);
 
-	CreditCard Credit = new CreditCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);
+	CreditCard Credit2 = new CreditCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);
 	company.addCardData("0234567890223451","DEBIT",exipery,"123",BigDecimal.valueOf(1));
 
 
 	try {
-		scs.cardReader.insert(Credit,"1234");
+		scs.cardReader.insert(Credit2,"1234");
 	} catch (SimulationException e) {
 		e.printStackTrace();
 
@@ -513,12 +513,12 @@ public void testCreditSwipeNotEnough() throws IOException {
 	scs.mainScanner.scan(unitItem1);
 	scs.baggingArea.add(unitItem1);
 
-	CreditCard Credit = new CreditCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);
+	CreditCard CreditNotEnough = new CreditCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);
 	company.addCardData("0234567890223451","DEBIT",exipery,"123",BigDecimal.valueOf(1));
 
 
 	try {
-		scs.cardReader.swipe(Credit,null);
+		scs.cardReader.swipe(CreditNotEnough,null);
 	} catch (SimulationException e) {
 		e.printStackTrace();
 
