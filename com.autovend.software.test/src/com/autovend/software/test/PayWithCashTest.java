@@ -1,5 +1,6 @@
 package com.autovend.software.test;
 
+import org.junit.*;
 /**
  * Members for Iteration 2:
  * Ethan Oke (30142180)

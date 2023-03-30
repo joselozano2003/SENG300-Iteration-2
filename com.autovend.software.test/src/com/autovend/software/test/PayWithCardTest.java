@@ -38,6 +38,7 @@ import java.util.GregorianCalendar;
 import com.autovend.*;
 import com.autovend.external.ProductDatabases;
 import com.autovend.software.ScanItems;
+import com.autovend.software.WeightDiscrepancy;
 import org.junit.*;
 import org.junit.Before;
 import org.junit.Test;
@@ -78,8 +79,9 @@ public class PayWithCardTest{
 	private int maxScaleWeight, sensitivity;
 	private double expectedBaggingWeight;
 	private ScanItems scanItems;
+	private WeightDiscrepancy weightDiscrepancy;
 	private PurchasedItems itemsPurchased;
-	private boolean scanFailed1, scanFailed2, scanFailed3;
+	private boolean scanFailed, cardFailed;
 
 	// initializing some barcodes to use during tests
 	Numeral[] n = {Numeral.one, Numeral.two, Numeral.three};
@@ -118,9 +120,8 @@ public void setUp() {
 	description2 = "item2";
 	description3 = "item3";
 
-	scanFailed1 = false;
-	scanFailed2 = false;
-	scanFailed3 = false;
+	scanFailed = false;
+	cardFailed = false;
 
 	//initialize some products
 	itemProduct1 = new BarcodedProduct(b1, description1, price1, weight1);
@@ -145,6 +146,7 @@ public void setUp() {
 
 	// initialize constructor and add each product to the list of products being scanned
 	scanItems = new ScanItems(scs);
+	weightDiscrepancy = new WeightDiscrepancy(scs);
 
 
 
@@ -158,18 +160,13 @@ public void setUp() {
 	scs.mainScanner.enable();
 	scs.handheldScanner.enable();
 	scs.handheldScanner.register(scanItems);
-	scs.baggingArea.register(scanItems);
+	scs.baggingArea.register(weightDiscrepancy);
 
 }
 	
 @After
 public void tearDown() {
-	scs = null;
-	company = null;
-	itemsPurchased = null;
-	amountToPay = null;
-	companyIssue = null;
-	exipery = null;
+
 	PurchasedItems.reset();
 }
 
@@ -181,7 +178,9 @@ public void testDebitTap() throws IOException {
 
 	PayWithCard PayWithDebit = new PayWithCard(scs,company);
 	scs.cardReader.register(PayWithDebit);
-	scs.mainScanner.scan(unitItem1);
+	while (scanFailed == false) {
+		scanFailed = scs.mainScanner.scan(unitItem1);
+	}
 	scs.baggingArea.add(unitItem1);
 
 	DebitCard DebitTap = new DebitCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);
@@ -208,7 +207,9 @@ public void testDebitInsert() throws IOException {
 	
 	PayWithCard PayWithDebit = new PayWithCard(scs,company);
 	scs.cardReader.register(PayWithDebit);
-	scs.mainScanner.scan(unitItem1);
+	while (scanFailed == false) {
+		scanFailed = scs.mainScanner.scan(unitItem1);
+	}
 	scs.baggingArea.add(unitItem1);
 
 	DebitCard DebitInsert = new DebitCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);
@@ -233,7 +234,9 @@ public void testDebitInsert() throws IOException {
 public void testDebitInsertWrongPin() throws IOException {
 	PayWithCard PayWithDebit = new PayWithCard(scs,company);
 	scs.cardReader.register(PayWithDebit);
-	scs.mainScanner.scan(unitItem1);
+	while (scanFailed == false) {
+		scanFailed = scs.mainScanner.scan(unitItem1);
+	}
 	scs.baggingArea.add(unitItem1);
 
 	DebitCard DebitWrong = new DebitCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);
@@ -250,7 +253,9 @@ public void testDebitInsertWrongPin() throws IOException {
 public void testDebitSwipe() throws IOException {
 	PayWithCard PayWithDebit = new PayWithCard(scs,company);
 	scs.cardReader.register(PayWithDebit);
-	scs.mainScanner.scan(unitItem1);
+	while (scanFailed == false) {
+		scanFailed = scs.mainScanner.scan(unitItem1);
+	}
 	scs.baggingArea.add(unitItem1);
 
 	DebitCard DebitSwipe = new DebitCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);
@@ -275,7 +280,9 @@ public void testDebitSwipe() throws IOException {
 public void testDebitTapNotEnough() throws IOException {
 	PayWithCard PayWithDebit = new PayWithCard(scs,company);
 	scs.cardReader.register(PayWithDebit);
-	scs.mainScanner.scan(unitItem1);
+	while (scanFailed == false) {
+		scanFailed = scs.mainScanner.scan(unitItem1);
+	}
 	scs.baggingArea.add(unitItem1);
 
 	DebitCard DebitTapWrong = new DebitCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);
@@ -303,7 +310,9 @@ public void testDebitTapNotEnough() throws IOException {
 public void testDebitInsertNotEnough() throws IOException {
 	PayWithCard PayWithDebit = new PayWithCard(scs,company);
 	scs.cardReader.register(PayWithDebit);
-	scs.mainScanner.scan(unitItem1);
+	while (scanFailed == false) {
+		scanFailed = scs.mainScanner.scan(unitItem1);
+	}
 	scs.baggingArea.add(unitItem1);
 
 	DebitCard DebitInsertWrong = new DebitCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);
@@ -331,7 +340,9 @@ public void testDebitInsertNotEnough() throws IOException {
 public void testDebitSwipeNotEnough() throws IOException {
 	PayWithCard PayWithDebit = new PayWithCard(scs,company);
 	scs.cardReader.register(PayWithDebit);
-	scs.mainScanner.scan(unitItem1);
+	while (scanFailed == false) {
+		scanFailed = scs.mainScanner.scan(unitItem1);
+	}
 	scs.baggingArea.add(unitItem1);
 
 	DebitCard Debit1 = new DebitCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);
@@ -360,7 +371,9 @@ public void testDebitSwipeNotEnough() throws IOException {
 public void testCreditTap() throws IOException {
 	PayWithCard PayWithCredit = new PayWithCard(scs,company);
 	scs.cardReader.register(PayWithCredit);
-	scs.mainScanner.scan(unitItem1);
+	while (scanFailed == false) {
+		scanFailed = scs.mainScanner.scan(unitItem1);
+	}
 	scs.baggingArea.add(unitItem1);
 
 	CreditCard CreditTap = new CreditCard("Credit", "0234567890223451", "credit", "123", "1234", true, true);
@@ -385,7 +398,9 @@ public void testCreditTap() throws IOException {
 public void testCreditInsert() throws IOException {
 	PayWithCard PayWithCredit = new PayWithCard(scs,company);
 	scs.cardReader.register(PayWithCredit);
-	scs.mainScanner.scan(unitItem1);
+	while (scanFailed == false) {
+		scanFailed = scs.mainScanner.scan(unitItem1);
+	}
 	scs.baggingArea.add(unitItem1);
 
 	CreditCard CreditInsert = new CreditCard("Credit", "0234567890223451", "credit", "123", "1234", true, true);
@@ -411,7 +426,9 @@ public void testCreditInsert() throws IOException {
 public void testCreditInsertWrongPin() throws IOException {
 	PayWithCard PayWithCredit = new PayWithCard(scs,company);
 	scs.cardReader.register(PayWithCredit);
-	scs.mainScanner.scan(unitItem1);
+	while (scanFailed == false) {
+		scanFailed = scs.mainScanner.scan(unitItem1);
+	}
 	scs.baggingArea.add(unitItem1);
 
 	CreditCard CreditWrong = new CreditCard("Credit", "0234567890223451", "credit", "123", "1234", true, true);
@@ -428,7 +445,9 @@ public void testCreditInsertWrongPin() throws IOException {
 public void testCreditSwipe() throws IOException {
 	PayWithCard PayWithCredit = new PayWithCard(scs,company);
 	scs.cardReader.register(PayWithCredit);
-	scs.mainScanner.scan(unitItem1);
+	while (scanFailed == false) {
+		scanFailed = scs.mainScanner.scan(unitItem1);
+	}
 	scs.baggingArea.add(unitItem1);
 
 	CreditCard CreditSwipe = new CreditCard("Credit", "0234567890223451", "credit", "123", "1234", true, true);
@@ -455,7 +474,9 @@ public void testCreditSwipe() throws IOException {
 public void testCreditTapNotEnough() throws IOException {
 	PayWithCard PayWithCredit = new PayWithCard(scs,company);
 	scs.cardReader.register(PayWithCredit);
-	scs.mainScanner.scan(unitItem1);
+	while (scanFailed == false) {
+		scanFailed = scs.mainScanner.scan(unitItem1);
+	}
 	scs.baggingArea.add(unitItem1);
 
 	CreditCard Credit1 = new CreditCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);
@@ -483,7 +504,9 @@ public void testCreditTapNotEnough() throws IOException {
 public void testCreditInsertNotEnough() throws IOException {
 	PayWithCard PayWithCredit = new PayWithCard(scs,company);
 	scs.cardReader.register(PayWithCredit);
-	scs.mainScanner.scan(unitItem1);
+	while (scanFailed == false) {
+		scanFailed = scs.mainScanner.scan(unitItem1);
+	}
 	scs.baggingArea.add(unitItem1);
 
 	CreditCard Credit2 = new CreditCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);
@@ -510,7 +533,9 @@ public void testCreditInsertNotEnough() throws IOException {
 public void testCreditSwipeNotEnough() throws IOException {
 	PayWithCard PayWithCredit = new PayWithCard(scs,company);
 	scs.cardReader.register(PayWithCredit);
-	scs.mainScanner.scan(unitItem1);
+	while (scanFailed == false) {
+		scanFailed = scs.mainScanner.scan(unitItem1);
+	}
 	scs.baggingArea.add(unitItem1);
 
 	CreditCard CreditNotEnough = new CreditCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);

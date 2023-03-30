@@ -39,6 +39,7 @@ import java.util.GregorianCalendar;
 import com.autovend.*;
 import com.autovend.external.ProductDatabases;
 import com.autovend.software.ScanItems;
+import com.autovend.software.WeightDiscrepancy;
 import org.junit.*;
 import org.junit.Before;
 import org.junit.Test;
@@ -78,6 +79,7 @@ public class PartiallyPaidTest {
 	private int maxScaleWeight, sensitivity;
 	private double expectedBaggingWeight;
 	private ScanItems scanItems;
+	private WeightDiscrepancy weightDiscrepancy;
 	private PurchasedItems itemsPurchased;
 	private ArrayList<BarcodedProduct> itemList;
 	private boolean scanFailed1, scanFailed2, scanFailed3;
@@ -149,6 +151,7 @@ public void setUp() {
 
 	// initialize constructor and add each product to the list of products being scanned
 	scanItems = new ScanItems(scs);
+	weightDiscrepancy = new WeightDiscrepancy(scs);
 
 
 
@@ -162,7 +165,7 @@ public void setUp() {
 	scs.mainScanner.enable();
 	scs.handheldScanner.enable();
 	scs.handheldScanner.register(scanItems);
-	scs.baggingArea.register(scanItems);
+	scs.baggingArea.register(weightDiscrepancy);
 
 }
 
