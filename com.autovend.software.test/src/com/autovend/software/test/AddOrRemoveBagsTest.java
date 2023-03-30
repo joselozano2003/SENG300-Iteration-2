@@ -6,12 +6,14 @@ import java.math.BigDecimal;
 import org.junit.*;
 import com.autovend.*;
 import com.autovend.devices.OverloadException;
+import com.autovend.devices.SelfCheckoutStation;
 import com.autovend.devices.SimulationException;
 import com.autovend.products.BarcodedProduct;
 import com.autovend.software.*;
 public class AddOrRemoveBagsTest {
 	Bag bag;
 	AddOrRemoveBags test;
+	SelfCheckoutStation scs;
 	//sets up for testing
 	@Before
 	public void setup() {
@@ -22,7 +24,7 @@ public class AddOrRemoveBagsTest {
 		double weight = 0.1;
 		boolean purchased = true;
 		bag = new Bag(barcode, string, price, weight, purchased);
-		test = new AddOrRemoveBags();
+		test = new AddOrRemoveBags(scs);
 	}
 	@After
 	public void tearDown() {
@@ -32,7 +34,7 @@ public class AddOrRemoveBagsTest {
 	//tests if the class is constructed correctly
 	@Test
 	public void AddOrRemoveBagsConstructorTest1() {
-		test = new AddOrRemoveBags();
+		test = new AddOrRemoveBags(scs);
 		assertTrue(test.bags.isEmpty());
 		assertTrue(test.bagsremaining.isEmpty());
 		assertEquals(test.storebags, 0);
@@ -71,7 +73,7 @@ public class AddOrRemoveBagsTest {
 		try {
 			test.purchaseBag();
 		}catch(SimulationException e) {
-				failed = true;
+			failed = true;
 		}
 		assertTrue(failed);
 	}
@@ -87,7 +89,7 @@ public class AddOrRemoveBagsTest {
 		}
 		assertTrue(failed);
 	}
-		//tests if a personal bag can be correctly added
+	//tests if a personal bag can be correctly added
 	@Test
 	public void AddOrRemoveBagsAddOwnBagTest1() {
 		Barcode zerocode = new Barcode(Numeral.valueOf("zero"));
@@ -171,11 +173,11 @@ public class AddOrRemoveBagsTest {
 		}
 		assertTrue(failed);
 	}
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
 }

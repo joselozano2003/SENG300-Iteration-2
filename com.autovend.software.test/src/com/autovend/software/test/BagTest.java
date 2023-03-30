@@ -46,7 +46,7 @@ public class BagTest {
 		BigDecimal price = BigDecimal.valueOf(0.5);
 		double weight = 100000;
 		BarcodedProduct product = new BarcodedProduct(bar,str,price,weight);
-		PurchasedItems.addProduct(product);
+		item.addProduct(product);
 		try {
 			bag.additem(item);
 		} catch (SimulationException e) {
@@ -64,11 +64,11 @@ public class BagTest {
 		BigDecimal price = BigDecimal.valueOf(0.5);
 		double weight = 10;
 		BarcodedProduct product = new BarcodedProduct(bar,str,price,weight);
-		PurchasedItems.addProduct(product);
+		item.addProduct(product);
 		try {
 			bag.additem(item);
 		} catch (OverloadException e) {}
-		assertEquals(PurchasedItems.getTotalExpectedWeight(), 10, 0);
+		assertEquals(bag.baggage.get(0).getTotalExpectedWeight(), 10, 0);
 	}
 	//tests if an exception is thrown when an item is attempted to be removed from an empty bag
 	@Test
@@ -91,7 +91,7 @@ public class BagTest {
 		BigDecimal price = BigDecimal.valueOf(0.5);
 		double weight = 10;
 		BarcodedProduct product = new BarcodedProduct(bar,str,price,weight);
-		PurchasedItems.addProduct(product);
+		item.addProduct(product);
 		try {
 			bag.additem(item);
 		} catch (OverloadException e) {}
@@ -110,24 +110,24 @@ public class BagTest {
 		assertTrue(failed);
 	}
 	//tests if a bag is emptied correctly
-		@Test
-		public void emptyBagTest2() {
-			PurchasedItems item = new PurchasedItems();
-			Numeral num = Numeral.valueOf("five");
-			Barcode bar = new Barcode(num);
-			String str = "test item";
-			BigDecimal price = BigDecimal.valueOf(0.5);
-			double weight = 10;
-			BarcodedProduct product = new BarcodedProduct(bar,str,price,weight);
-			PurchasedItems.addProduct(product);
-			try {
-				bag.additem(item);
-			} catch (OverloadException e) {}
-			bag.emptyBag();
-			assertTrue(bag.baggage.isEmpty());
-		}
-	
-	
-	
-	
+	@Test
+	public void emptyBagTest2() {
+		PurchasedItems item = new PurchasedItems();
+		Numeral num = Numeral.valueOf("five");
+		Barcode bar = new Barcode(num);
+		String str = "test item";
+		BigDecimal price = BigDecimal.valueOf(0.5);
+		double weight = 10;
+		BarcodedProduct product = new BarcodedProduct(bar,str,price,weight);
+		item.addProduct(product);
+		try {
+			bag.additem(item);
+		} catch (OverloadException e) {}
+		bag.emptyBag();
+		assertTrue(bag.baggage.isEmpty());
+	}
+
+
+
+
 }
