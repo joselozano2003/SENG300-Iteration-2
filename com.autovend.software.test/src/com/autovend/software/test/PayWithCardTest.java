@@ -143,6 +143,7 @@ public void tearDown() {
 	amountToPay = null;
 	companyIssue = null;
 	exipery = null;
+	PurchasedItems.reset();
 }
 
 
@@ -174,6 +175,7 @@ public void testDebitTap() throws IOException {
 
 @Test
 public void testDebitInsert() {
+	Assert.assertEquals(new BigDecimal(0), PurchasedItems.getAmountPaid());
 
 }
 
