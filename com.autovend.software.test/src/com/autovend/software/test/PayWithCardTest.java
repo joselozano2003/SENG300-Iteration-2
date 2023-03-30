@@ -232,28 +232,71 @@ public void testDebitTapNotEnough() throws IOException {
 
 
 	try {
-		scs.cardReader.swipe(Debit,null);
+		scs.cardReader.tap(Debit);
 	} catch (SimulationException e) {
 		e.printStackTrace();
 
 		// TODO Auto-generated catch block
 		e.printStackTrace();
 	}
-
+	
 	Assert.assertEquals(new BigDecimal(2), PurchasedItems.getAmountLeftToPay());
 	Assert.assertEquals(new BigDecimal(0), PurchasedItems.getAmountPaid());
+	
 }
 
 
 @Test
-public void testDebitInsertNotEnough() {
+public void testDebitInsertNotEnough() throws IOException {
+	PayWithCard PayWithDebit = new PayWithCard(scs,company);
+	scs.cardReader.register(PayWithDebit);
+	scs.mainScanner.scan(unitItem1);
+	scs.baggingArea.add(unitItem1);
 
+	DebitCard Debit = new DebitCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);
+	company.addCardData("0234567890223451","DEBIT",exipery,"123",BigDecimal.valueOf(1));
+
+
+	try {
+		scs.cardReader.insert(Debit,"1234");
+	} catch (SimulationException e) {
+		e.printStackTrace();
+
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+	Assert.assertEquals(new BigDecimal(2), PurchasedItems.getAmountLeftToPay());
+	Assert.assertEquals(new BigDecimal(0), PurchasedItems.getAmountPaid());
+	
 }
+
 
 @Test
-public void testDebitSwipeNotEnough() {
+public void testDebitSwipeNotEnough() throws IOException {
+	PayWithCard PayWithDebit = new PayWithCard(scs,company);
+	scs.cardReader.register(PayWithDebit);
+	scs.mainScanner.scan(unitItem1);
+	scs.baggingArea.add(unitItem1);
 
+	DebitCard Debit = new DebitCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);
+	company.addCardData("0234567890223451","DEBIT",exipery,"123",BigDecimal.valueOf(1));
+
+
+	try {
+		scs.cardReader.swipe(Debit, null);
+	} catch (SimulationException e) {
+		e.printStackTrace();
+
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+	Assert.assertEquals(new BigDecimal(2), PurchasedItems.getAmountLeftToPay());
+	Assert.assertEquals(new BigDecimal(0), PurchasedItems.getAmountPaid());
+	
 }
+
 
 
 @Test
