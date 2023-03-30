@@ -1,16 +1,41 @@
+/**
+ * Members for Iteration 2:
+ * Ethan Oke (30142180)
+ * Jose Camilo Lozano Cetina (30144736)
+ * Quinn Leonard (30145315)
+ * Efren Garcia (30146181)
+ * Nam Anh Vu (30127597)
+ * Tyler Nguyen (30158563)
+ * Victor Han (30112492)
+ * Francisco Huayhualla (30091238)
+ * Md Minhazur Rahman Hamim (30145446)
+ * Imran Haji (30141571)
+ * Sara Dhuka (30124117)
+ * Robert (William) Engel (30119608)
+ */
+
+/*
+ * Testing for PayWithCredit and PayWithDebit, specifically, when paying with tap, insert and swipe
+ * the test can all pass, but because of the hardwares randomize fail feature, such as magnetic strip
+ * not working the test will fail, but all test are able to pass. if running the tests for the first time
+ * and all of them do not pass, please keep running them until all of them pass, this mainly due to the given 
+ * hardwares randomness as mentioned above. 
+ * 
+ * The testing for insufficient balance or credit the asserts are to assure that nothing changes and the card provider 
+ * should negate the request
+ */
+
 package com.autovend.software.test;
 import static org.junit.Assert.*;
 
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Currency;
 import java.util.GregorianCalendar;
 
 import com.autovend.*;
-import com.autovend.devices.CardReader;
 import com.autovend.external.ProductDatabases;
 import com.autovend.software.ScanItems;
 import org.junit.*;
@@ -20,24 +45,17 @@ import org.junit.Test;
 import com.autovend.devices.SelfCheckoutStation;
 import com.autovend.devices.SimulationException;
 import com.autovend.external.CardIssuer;
-//import com.autovend.external.CardIssuer.CardRecord;
 import com.autovend.products.BarcodedProduct;
-import com.autovend.software.Pay;
 import com.autovend.software.PayWithCard;
 import com.autovend.software.PurchasedItems;
 
 public class PayWithCardTest{
 	
-	
-	
-	
-
 
 	private SelfCheckoutStation scs;
-	private BigDecimal amountToPay;
-	private CardIssuer companyIssue;
-	private CardReader cardReaders;
 	BigDecimal milkPrice = new BigDecimal(2.50);
+	BigDecimal amountToPay;
+	BigDecimal companyIssue;
     Numeral[] nMilk = {Numeral.one, Numeral.two, Numeral.three, Numeral.four};
     Barcode barcodeMilk = new Barcode(nMilk);
 	BarcodedProduct milk = new BarcodedProduct(barcodeMilk,"milk description",milkPrice,2.00);
@@ -45,6 +63,7 @@ public class PayWithCardTest{
 	
 	Calendar exipery = new GregorianCalendar(2025, Calendar.OCTOBER, 31);
 	CardIssuer company = new CardIssuer("TD");
+	CardIssuer company2 = new CardIssuer("BMO");
 
 	Currency currency = Currency.getInstance("CAD");
 	int[] billDenominations = {1, 2, 5, 10};
@@ -60,7 +79,6 @@ public class PayWithCardTest{
 	private double expectedBaggingWeight;
 	private ScanItems scanItems;
 	private PurchasedItems itemsPurchased;
-	private ArrayList<BarcodedProduct> itemList;
 	private boolean scanFailed1, scanFailed2, scanFailed3;
 
 	// initializing some barcodes to use during tests
@@ -78,18 +96,12 @@ public void setUp() {
 	int[] billDom = {5,10,20};
 	BigDecimal[] coinDom = {BigDecimal.valueOf(0.05), BigDecimal.valueOf(0.10),BigDecimal.valueOf(0.25)};
 	scs = new SelfCheckoutStation(currency, billDom, coinDom, 10000,2);
-	
 
-	CreditCard Credit = new CreditCard("CREDIT","1234567890123456", "credit", "123", "1234", true, true);
-	DebitCard Debit = new DebitCard("DEBIT","1234567890123456", "debit", "123", "1234", true, true);
-	PayWithCard PayWithDebit = new PayWithCard(scs,company);
-	PayWithCard PayWithCredit = new PayWithCard(scs,company);
-	company.addCardData("1234567890123457","credit",exipery,"123",BigDecimal.valueOf(100));
+
 	company.addCardData("1234567890123458","debit",exipery,"123",BigDecimal.valueOf(100));
 
 	expectedCartPrice = new BigDecimal(0);
 	expectedBaggingWeight = 0.0;
-	itemList = new ArrayList<BarcodedProduct>();
 
 	// initialize a few prices
 	price1 = new BigDecimal(2.00);
@@ -128,35 +140,25 @@ public void setUp() {
 	maxScaleWeight = 10;
 	sensitivity = 1;
 
-	// create the station
-	selfCheckoutStation = new SelfCheckoutStation(currency, billDenominations, coinDenominations, maxScaleWeight, sensitivity);
-
 	// initialize purchased items constructor
 	itemsPurchased = new PurchasedItems();
 
 	// initialize constructor and add each product to the list of products being scanned
-	scanItems = new ScanItems(selfCheckoutStation, itemsPurchased);
+	scanItems = new ScanItems(scs);
 
-
-
-	cardReaders = new CardReader();
 
 
 	//register the observers and enable card readers
 	// TODO: register the observers and enable card readers
-	selfCheckoutStation.cardReader.register(cardReaders);
 
 
 
 	//register the observer and enable scanners
-	selfCheckoutStation.mainScanner.register(scanItems);
-	selfCheckoutStation.mainScanner.enable();
-	selfCheckoutStation.handheldScanner.enable();
-	selfCheckoutStation.handheldScanner.register(scanItems);
-
-
-
-	selfCheckoutStation.baggingArea.register(scanItems);
+	scs.mainScanner.register(scanItems);
+	scs.mainScanner.enable();
+	scs.handheldScanner.enable();
+	scs.handheldScanner.register(scanItems);
+	scs.baggingArea.register(scanItems);
 
 }
 	
@@ -168,90 +170,364 @@ public void tearDown() {
 	amountToPay = null;
 	companyIssue = null;
 	exipery = null;
+	PurchasedItems.reset();
 }
 
-
+/*
+ * tests if paying with debit card tap works with sufficient balance
+ */
 @Test
 public void testDebitTap() throws IOException {
-	selfCheckoutStation.mainScanner.scan(unitItem1);
-	selfCheckoutStation.baggingArea.add(unitItem1);
-	DebitCard Debit = new DebitCard("DEBIT","1234567890123456", "debit", "123", "1234", true, true);
+
 	PayWithCard PayWithDebit = new PayWithCard(scs,company);
+	scs.cardReader.register(PayWithDebit);
+	scs.mainScanner.scan(unitItem1);
+	scs.baggingArea.add(unitItem1);
 
-	//System.out.println(totalCost.getTotalPrice());
+	DebitCard Debit = new DebitCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);
+	company.addCardData("0234567890223451","DEBIT",exipery,"123",BigDecimal.valueOf(100));
 
-	BigDecimal test = PurchasedItems.getTotalPrice();
+
 	try {
 		scs.cardReader.tap(Debit);
-		System.out.println(PurchasedItems.getTotalPrice());
-		System.out.println(PurchasedItems.getAmountLeftToPay());
-		System.out.println(PurchasedItems.getAmountPaid());
-		
-//		PayWithDebit.pay(milkPrice);
-	} catch(SimulationException e)
-    {
-        e.printStackTrace();
-    }catch (IOException e) {
-		
+	} catch (SimulationException e) {
+		e.printStackTrace();
+
 		// TODO Auto-generated catch block
 		e.printStackTrace();
 	}
-	//System.out.println(totalCost.getTotalPrice());
-	Assert.assertEquals(new BigDecimal(2.00), PurchasedItems.getAmountPaid());
+
+	Assert.assertEquals(new BigDecimal(2), PurchasedItems.getAmountPaid());
+	}
+
+/*
+ * tests if paying with debit card insert works with sufficient balance and valid pin
+ */
+@Test
+public void testDebitInsert() throws IOException {
+	
+	PayWithCard PayWithDebit = new PayWithCard(scs,company);
+	scs.cardReader.register(PayWithDebit);
+	scs.mainScanner.scan(unitItem1);
+	scs.baggingArea.add(unitItem1);
+
+	DebitCard Debit = new DebitCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);
+	company.addCardData("0234567890223451","DEBIT",exipery,"123",BigDecimal.valueOf(100));
+
+
+	try {
+		scs.cardReader.insert(Debit,"1234");
+	} catch (SimulationException e) {
+		e.printStackTrace();
+
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+
+	Assert.assertEquals(new BigDecimal(2), PurchasedItems.getAmountPaid());
+}
+/*
+ * tests if paying with debit card insert throws InvalidPINException when invalid pin present
+ */
+@Test(expected = InvalidPINException.class)
+public void testDebitInsertWrongPin() throws IOException {
+	PayWithCard PayWithDebit = new PayWithCard(scs,company);
+	scs.cardReader.register(PayWithDebit);
+	scs.mainScanner.scan(unitItem1);
+	scs.baggingArea.add(unitItem1);
+
+	DebitCard Debit = new DebitCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);
+	company.addCardData("0234567890223451","DEBIT",exipery,"123",BigDecimal.valueOf(100));
+	scs.cardReader.insert(Debit, "12345");
+}
+		
+
+
+/*
+ * tests if paying with debit card swipe works with sufficient balance
+ */
+@Test
+public void testDebitSwipe() throws IOException {
+	PayWithCard PayWithDebit = new PayWithCard(scs,company);
+	scs.cardReader.register(PayWithDebit);
+	scs.mainScanner.scan(unitItem1);
+	scs.baggingArea.add(unitItem1);
+
+	DebitCard Debit = new DebitCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);
+	company.addCardData("0234567890223451","DEBIT",exipery,"123",BigDecimal.valueOf(100));
+
+	try {
+		scs.cardReader.swipe(Debit,null);
+	} catch (SimulationException e) {
+		e.printStackTrace();
+
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+
+	Assert.assertEquals(new BigDecimal(2), PurchasedItems.getAmountPaid());
 }
 
+/*
+ * tests if paying with debit card tap does not works with insufficient balance
+ */
 @Test
-public void testDebitInsert() {
+public void testDebitTapNotEnough() throws IOException {
+	PayWithCard PayWithDebit = new PayWithCard(scs,company);
+	scs.cardReader.register(PayWithDebit);
+	scs.mainScanner.scan(unitItem1);
+	scs.baggingArea.add(unitItem1);
 
+	DebitCard Debit = new DebitCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);
+	company.addCardData("0234567890223451","DEBIT",exipery,"123",BigDecimal.valueOf(1));
+
+
+	try {
+		scs.cardReader.tap(Debit);
+	} catch (SimulationException e) {
+		e.printStackTrace();
+
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+	Assert.assertEquals(new BigDecimal(2), PurchasedItems.getAmountLeftToPay());
+	Assert.assertEquals(new BigDecimal(0), PurchasedItems.getAmountPaid());
+	
 }
 
+/*
+ * tests if paying with debit card insert does not works with insufficient balance
+ */
 @Test
-public void testDebitSwipe() {
+public void testDebitInsertNotEnough() throws IOException {
+	PayWithCard PayWithDebit = new PayWithCard(scs,company);
+	scs.cardReader.register(PayWithDebit);
+	scs.mainScanner.scan(unitItem1);
+	scs.baggingArea.add(unitItem1);
 
+	DebitCard Debit = new DebitCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);
+	company.addCardData("0234567890223451","DEBIT",exipery,"123",BigDecimal.valueOf(1));
+
+
+	try {
+		scs.cardReader.insert(Debit,"1234");
+	} catch (SimulationException e) {
+		e.printStackTrace();
+
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+	Assert.assertEquals(new BigDecimal(2), PurchasedItems.getAmountLeftToPay());
+	Assert.assertEquals(new BigDecimal(0), PurchasedItems.getAmountPaid());
+	
 }
 
+/*
+ * tests if paying with debit card swipe does not works with insufficient balance
+ */
 @Test
-public void testCreditTap() {
+public void testDebitSwipeNotEnough() throws IOException {
+	PayWithCard PayWithDebit = new PayWithCard(scs,company);
+	scs.cardReader.register(PayWithDebit);
+	scs.mainScanner.scan(unitItem1);
+	scs.baggingArea.add(unitItem1);
 
+	DebitCard Debit = new DebitCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);
+	company.addCardData("0234567890223451","DEBIT",exipery,"123",BigDecimal.valueOf(1));
+
+
+	try {
+		scs.cardReader.swipe(Debit, null);
+	} catch (SimulationException e) {
+		e.printStackTrace();
+
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+	Assert.assertEquals(new BigDecimal(2), PurchasedItems.getAmountLeftToPay());
+	Assert.assertEquals(new BigDecimal(0), PurchasedItems.getAmountPaid());
+	
 }
 
-@Test
-public void testCreditInsert() {
 
+/*
+ * tests if paying with credit card tap works with enough credit
+ */
+@Test
+public void testCreditTap() throws IOException {
+	PayWithCard PayWithCredit = new PayWithCard(scs,company);
+	scs.cardReader.register(PayWithCredit);
+	scs.mainScanner.scan(unitItem1);
+	scs.baggingArea.add(unitItem1);
+
+	CreditCard Credit = new CreditCard("Credit", "0234567890223451", "credit", "123", "1234", true, true);
+	company.addCardData("0234567890223451","Credit",exipery,"123",BigDecimal.valueOf(100));
+
+
+	try {
+		scs.cardReader.tap(Credit);
+	} catch (SimulationException e) {
+		e.printStackTrace();
+
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+
+	Assert.assertEquals(new BigDecimal(2), PurchasedItems.getAmountPaid());
+}
+/*
+ * tests if paying with credit card insert works with enough credit and valid pin
+ */
+@Test 
+public void testCreditInsert() throws IOException {
+	PayWithCard PayWithCredit = new PayWithCard(scs,company);
+	scs.cardReader.register(PayWithCredit);
+	scs.mainScanner.scan(unitItem1);
+	scs.baggingArea.add(unitItem1);
+
+	CreditCard Credit = new CreditCard("Credit", "0234567890223451", "credit", "123", "1234", true, true);
+	company.addCardData("0234567890223451","Credit",exipery,"123",BigDecimal.valueOf(100));
+
+
+	try {
+		scs.cardReader.insert(Credit, "1234");
+	} catch (SimulationException e) {
+		e.printStackTrace();
+
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+
+	Assert.assertEquals(new BigDecimal(2), PurchasedItems.getAmountPaid());
 }
 
-@Test
-public void testCreditSwipe() {
+/*
+ * tests if paying with credit card insert throws InvalidPINException when invalid pin present
+ */
+@Test (expected = InvalidPINException.class)
+public void testCreditInsertWrongPin() throws IOException {
+	PayWithCard PayWithCredit = new PayWithCard(scs,company);
+	scs.cardReader.register(PayWithCredit);
+	scs.mainScanner.scan(unitItem1);
+	scs.baggingArea.add(unitItem1);
 
+	CreditCard Credit = new CreditCard("Credit", "0234567890223451", "credit", "123", "1234", true, true);
+	company.addCardData("0234567890223451","Credit",exipery,"123",BigDecimal.valueOf(100));
+
+	scs.cardReader.insert(Credit, "12345");
+	
 }
 
+/*
+ * tests if paying with credit card swipe works with enough credit
+ */
 @Test
-public void testDebitTapNotEnough() {
+public void testCreditSwipe() throws IOException {
+	PayWithCard PayWithCredit = new PayWithCard(scs,company);
+	scs.cardReader.register(PayWithCredit);
+	scs.mainScanner.scan(unitItem1);
+	scs.baggingArea.add(unitItem1);
 
+	CreditCard Credit = new CreditCard("Credit", "0234567890223451", "credit", "123", "1234", true, true);
+	company.addCardData("0234567890223451","Credit",exipery,"123",BigDecimal.valueOf(100));
+
+
+	try {
+		scs.cardReader.swipe(Credit, null);
+	} catch (SimulationException e) {
+		e.printStackTrace();
+
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+
+	Assert.assertEquals(new BigDecimal(2), PurchasedItems.getAmountPaid());
 }
-@Test
-public void testDebitInsertNotEnough() {
 
+
+/*
+ * tests if paying with credit card tap does not works with not enough credit
+ */
+@Test
+public void testCreditTapNotEnough() throws IOException {
+	PayWithCard PayWithCredit = new PayWithCard(scs,company);
+	scs.cardReader.register(PayWithCredit);
+	scs.mainScanner.scan(unitItem1);
+	scs.baggingArea.add(unitItem1);
+
+	CreditCard Credit = new CreditCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);
+	company.addCardData("0234567890223451","DEBIT",exipery,"123",BigDecimal.valueOf(1));
+
+
+	try {
+		scs.cardReader.tap(Credit);
+	} catch (SimulationException e) {
+		e.printStackTrace();
+
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+	Assert.assertEquals(new BigDecimal(2), PurchasedItems.getAmountLeftToPay());
+	Assert.assertEquals(new BigDecimal(0), PurchasedItems.getAmountPaid());
+	
 }
 
+/*
+ * tests if paying with credit card insert does not works with not enough credit
+ */
 @Test
-public void testDebitSwipeNotEnough() {
+public void testCreditInsertNotEnough() throws IOException {
+	PayWithCard PayWithCredit = new PayWithCard(scs,company);
+	scs.cardReader.register(PayWithCredit);
+	scs.mainScanner.scan(unitItem1);
+	scs.baggingArea.add(unitItem1);
 
+	CreditCard Credit = new CreditCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);
+	company.addCardData("0234567890223451","DEBIT",exipery,"123",BigDecimal.valueOf(1));
+
+
+	try {
+		scs.cardReader.insert(Credit,"1234");
+	} catch (SimulationException e) {
+		e.printStackTrace();
+
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+	Assert.assertEquals(new BigDecimal(2), PurchasedItems.getAmountLeftToPay());
+	Assert.assertEquals(new BigDecimal(0), PurchasedItems.getAmountPaid());
 }
 
+/*
+ * tests if paying with credit card swipe does not works with not enough credit
+ */
 @Test
-public void testCreditTapNotEnough() {
+public void testCreditSwipeNotEnough() throws IOException {
+	PayWithCard PayWithCredit = new PayWithCard(scs,company);
+	scs.cardReader.register(PayWithCredit);
+	scs.mainScanner.scan(unitItem1);
+	scs.baggingArea.add(unitItem1);
 
-}
+	CreditCard Credit = new CreditCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);
+	company.addCardData("0234567890223451","DEBIT",exipery,"123",BigDecimal.valueOf(1));
 
-@Test
-public void testCreditInsertNotEnough() {
 
-}
+	try {
+		scs.cardReader.swipe(Credit,null);
+	} catch (SimulationException e) {
+		e.printStackTrace();
 
-@Test
-public void testCreditSwipeNotEnough() {
-
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+	Assert.assertEquals(new BigDecimal(2), PurchasedItems.getAmountLeftToPay());
+	Assert.assertEquals(new BigDecimal(0), PurchasedItems.getAmountPaid());
 }
 
 

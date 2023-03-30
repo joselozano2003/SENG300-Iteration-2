@@ -3,6 +3,7 @@
 package com.autovend.software;
 import com.autovend.devices.*;
 import com.autovend.products.BarcodedProduct;
+import com.autovend.software.test.ReceiptPrinterObserverStub;
 
 import java.util.ArrayList;
 

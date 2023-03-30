@@ -22,7 +22,7 @@ public abstract class Pay extends AbstractDevice<PayObserver> {
         amountDue = PurchasedItems.getAmountLeftToPay();
     }
 
-    public void pay(BigDecimal amountToPay) {
+    protected void pay(BigDecimal amountToPay) {
         PurchasedItems.addAmountPaid(amountToPay);
         BigDecimal amountPaid = PurchasedItems.getAmountPaid();
     	if (amountPaid.equals(amountDue)) {
@@ -33,6 +33,6 @@ public abstract class Pay extends AbstractDevice<PayObserver> {
     }
 
     public BigDecimal getAmountDue() {
-        return amountDue;
+        return PurchasedItems.getAmountLeftToPay();
     }
 }
