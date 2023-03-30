@@ -1,6 +1,7 @@
 package com.autovend.software;
 
 import com.autovend.products.BarcodedProduct;
+import com.autovend.products.Product;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.ArrayList;
 public class PurchasedItems{
 
     private static ArrayList<BarcodedProduct> listOfProducts;
+    private static ArrayList<Product> listOfBags;
     private static BigDecimal totalPrice;
     private static double totalExpectedWeight;
     private static BigDecimal change;
@@ -17,6 +19,7 @@ public class PurchasedItems{
 
     static {
         listOfProducts = new ArrayList<>();
+        listOfBags = new ArrayList<>();
         totalPrice = new BigDecimal(0);
         amountPaid = new BigDecimal(0);
         totalExpectedWeight = 0;
@@ -31,11 +34,23 @@ public class PurchasedItems{
         if (totalPrice.compareTo(amountPaid) >= 0) {
             isPaid = false;
         }
+    }
 
+    public static void addBag(Bag bag){
+        listOfBags.add(bag);
+        totalPrice = totalPrice.add(bag.getPrice());
+        totalExpectedWeight += bag.getWeight();
+        if (totalPrice.compareTo(amountPaid) >= 0) {
+            isPaid = false;
+        }
     }
 
     public static ArrayList<BarcodedProduct> getListOfProducts(){
         return listOfProducts;
+    }
+
+    public static ArrayList<Product> getListOfOtherProducts(){
+        return listOfBags;
     }
 
     // I think this is not necessary for this iteration but will be useful for future ones
@@ -43,6 +58,12 @@ public class PurchasedItems{
         listOfProducts.remove(product);
         totalPrice = totalPrice.subtract(product.getPrice());
         totalExpectedWeight -= product.getExpectedWeight();
+    }
+
+    public static void removeOtherProduct(Product product, double weight){
+        listOfBags.remove(product);
+        totalPrice = totalPrice.subtract(product.getPrice());
+        totalExpectedWeight -= weight;
     }
 
     public static BigDecimal getTotalPrice(){
@@ -82,7 +103,7 @@ public class PurchasedItems{
     }
 
 
-    // This method is used for testing purposes ONLY for scanItemsTest
+    // This method is used for testing purposes ONLY
     public static void setAmountPaid(BigDecimal amount) {
     	amountPaid = amount;
         if (amountPaid.compareTo(totalPrice) >= 0) {
@@ -92,6 +113,7 @@ public class PurchasedItems{
 
     public static void reset() {
     	listOfProducts = new ArrayList<>();
+        listOfBags = new ArrayList<>();
         totalPrice = new BigDecimal(0);
         amountPaid = new BigDecimal(0);
         totalExpectedWeight = 0;
