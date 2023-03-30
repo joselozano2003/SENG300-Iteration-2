@@ -105,12 +105,12 @@ public class ScanItemsTest {
 		scanItems = new ScanItems(selfCheckoutStation);
 		
 		//register the observer and enable scanners
-		selfCheckoutStation.mainScanner.register(scanItems);
 		selfCheckoutStation.mainScanner.enable();
+		selfCheckoutStation.mainScanner.register(scanItems);
 		selfCheckoutStation.handheldScanner.enable();
 		selfCheckoutStation.handheldScanner.register(scanItems);
 		
-		selfCheckoutStation.baggingArea.register(scanItems);
+		//selfCheckoutStation.baggingArea.register(scanItems);
 	}
 	
 	@After

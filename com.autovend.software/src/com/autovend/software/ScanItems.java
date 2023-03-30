@@ -16,7 +16,7 @@ import com.autovend.external.ProductDatabases;
 import com.autovend.products.BarcodedProduct;
 import com.autovend.software.test.CustomerIOStub;
 
-public class ScanItems extends AddItem implements BarcodeScannerObserver, ElectronicScaleObserver{
+public class ScanItems extends AddItem implements BarcodeScannerObserver{
 
     private SelfCheckoutStation selfCheckoutStation;
     private PurchasedItems purchaseList;
@@ -68,21 +68,6 @@ public class ScanItems extends AddItem implements BarcodeScannerObserver, Electr
      */
 
     // 6. Signals to the system that the weight has changed.
-    @Override
-    public void reactToWeightChangedEvent(ElectronicScale scale, double weightInGrams) {
-        // Exception 1. Weight Discrepancy
-        // stays disabled if the weight of the bagging area does not match the expected weight
-        try {
-            if(purchaseList.getTotalExpectedWeight() == selfCheckoutStation.baggingArea.getCurrentWeight()) {
-                selfCheckoutStation.handheldScanner.enable();
-                selfCheckoutStation.mainScanner.enable();
-            }
-
-        } catch (OverloadException e) {
-            // TODO Auto-generated catch block
-        }
-
-    }
 
     @Override
     public void reactToEnabledEvent(AbstractDevice<? extends AbstractDeviceObserver> device) {
@@ -91,18 +76,6 @@ public class ScanItems extends AddItem implements BarcodeScannerObserver, Electr
     }
     @Override
     public void reactToDisabledEvent(AbstractDevice<? extends AbstractDeviceObserver> device) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void reactToOverloadEvent(ElectronicScale scale) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void reactToOutOfOverloadEvent(ElectronicScale scale) {
         // TODO Auto-generated method stub
 
     }
