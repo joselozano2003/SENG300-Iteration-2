@@ -16,7 +16,7 @@ import com.autovend.external.ProductDatabases;
 import com.autovend.products.BarcodedProduct;
 import com.autovend.software.test.CustomerIOStub;
 
-public class ScanItems implements BarcodeScannerObserver, ElectronicScaleObserver{
+public class ScanItems extends AddItem implements BarcodeScannerObserver, ElectronicScaleObserver{
 
     private SelfCheckoutStation selfCheckoutStation;
     private PurchasedItems purchaseList;
@@ -25,6 +25,7 @@ public class ScanItems implements BarcodeScannerObserver, ElectronicScaleObserve
      * Constructor for ScanItems
      */
     public ScanItems(SelfCheckoutStation station) {
+        super(station);
         PurchasedItems purchasedItems = new PurchasedItems();
         this.selfCheckoutStation = station;
         this.purchaseList = purchasedItems;
@@ -50,7 +51,7 @@ public class ScanItems implements BarcodeScannerObserver, ElectronicScaleObserve
         // 4. System: Updates the expected weight from the Bagging Area.
         BarcodedProduct itemProduct = ProductDatabases.BARCODED_PRODUCT_DATABASE.get(barcode);
         double itemWeight = itemProduct.getExpectedWeight();
-        purchaseList.addProduct(itemProduct);
+        addBarcodedProduct(itemProduct);
 
         // 5. System: Signals to the Customer I/O to place the scanned item in the Bagging Area.
         BarcodedUnit scannedUnit = new BarcodedUnit(barcode, itemWeight);

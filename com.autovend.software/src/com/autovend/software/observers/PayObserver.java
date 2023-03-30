@@ -1,9 +1,10 @@
 
-package com.autovend.software;
+package com.autovend.software.observers;
 
 import com.autovend.devices.BillDispenser;
 import com.autovend.devices.BillSlot;
 import com.autovend.devices.observers.AbstractDeviceObserver;
+import com.autovend.software.Pay;
 
 public interface PayObserver extends AbstractDeviceObserver {
 

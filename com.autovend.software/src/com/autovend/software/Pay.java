@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import com.autovend.devices.AbstractDevice;
 import com.autovend.devices.SelfCheckoutStation;
 import com.autovend.devices.SimulationException;
+import com.autovend.software.observers.PayObserver;
 
 
 public abstract class Pay extends AbstractDevice<PayObserver> {
@@ -22,7 +23,7 @@ public abstract class Pay extends AbstractDevice<PayObserver> {
         amountDue = PurchasedItems.getAmountLeftToPay();
     }
 
-    public void pay(BigDecimal amountToPay) {
+    protected void pay(BigDecimal amountToPay) {
         PurchasedItems.addAmountPaid(amountToPay);
         BigDecimal amountPaid = PurchasedItems.getAmountPaid();
     	if (amountPaid.equals(amountDue)) {

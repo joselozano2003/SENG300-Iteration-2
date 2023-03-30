@@ -1,23 +1,18 @@
 package com.autovend.software;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Currency;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import com.autovend.Bill;
 import com.autovend.Coin;
 import com.autovend.devices.AbstractDevice;
 import com.autovend.devices.BillDispenser;
-import com.autovend.devices.BillSlot;
 import com.autovend.devices.BillValidator;
 import com.autovend.devices.CoinDispenser;
 import com.autovend.devices.CoinValidator;
-import com.autovend.devices.DisabledException;
-import com.autovend.devices.EmptyException;
-import com.autovend.devices.OverloadException;
 import com.autovend.devices.SelfCheckoutStation;
 import com.autovend.devices.observers.AbstractDeviceObserver;
 import com.autovend.devices.observers.BillDispenserObserver;
@@ -28,20 +23,18 @@ import com.autovend.devices.observers.CoinValidatorObserver;
 /**
  * Class that allows customer to pay with cash.
  *
- *
  */
 public class PayWithCash extends Pay implements BillDispenserObserver, BillValidatorObserver, CoinDispenserObserver, CoinValidatorObserver {
 
-	private BigDecimal amountToPay;
-	private BillDispenser billDispenser;
-	private CoinDispenser coinDispenser;
-	private Bill bill;
-	private Coin coin;
-	private Currency tempcurrency = Currency.getInstance("CAD");
-	private List<Integer> billValues;
-	private List<BigDecimal> coinValues;
-	private Map<Integer, Integer> billAmount = new HashMap<Integer, Integer>();
-	private Map<BigDecimal, Integer> coinAmount = new HashMap<BigDecimal, Integer>();
+    public final int[] billDenominations;
+
+	private final Map<Integer, BillDispenser> billDispensers;
+
+	private final List<BigDecimal> coinDenominations;
+	private final Map<BigDecimal, CoinDispenser> coinDispensers;
+    private ArrayList<BigDecimal> changeValues;
+    private ArrayList<Bill> billsChange;
+    private ArrayList<Coin> coinsChange;
 
 	// If there is a change, sum up all bills+coins and send to dp
 	// paid == due -> Disable/sth
@@ -49,15 +42,64 @@ public class PayWithCash extends Pay implements BillDispenserObserver, BillValid
 
     public PayWithCash(SelfCheckoutStation station) {
         super(station);
-		PurchasedItems items = new PurchasedItems();
-		/*
-        if (amountToPay.compareTo(super.getAmountDue()) > 0) {
-			this.amountToPay = super.getAmountDue();
-		} else this.amountToPay = amountToPay;
-        this.billDispenser = billDispenser;
-        this.coinDispenser = coinDispenser;*/
-    }
+        this.billDenominations = station.billDenominations;
+        this.billDispensers = station.billDispensers;
+        this.coinDenominations = station.coinDenominations;
+        this.coinDispensers = station.coinDispensers;
 
+        changeValues = new ArrayList<>();
+        coinsChange = new ArrayList<>();
+        billsChange =  new ArrayList<>();
+    }
+    
+    public void PassChange(BigDecimal change) {
+		ArrayList<BigDecimal> res = ChangeCalculator.calculateChange(changeValues, change);
+        for(BigDecimal value : res)
+        {   
+            if(coinDispensers.containsKey(value))
+            {
+                CoinDispenser dis = coinDispensers.get(value);
+                try
+                {
+                    dis.emit();
+                }
+                catch(Exception e)
+                {
+                    //print stack trace
+                    e.printStackTrace();
+                }
+            }
+            else{
+                int billVal = value.intValue();
+                if(billDispensers.containsKey(billVal))
+                {
+                    BillDispenser dis = billDispensers.get(billVal);
+                    try
+                    {
+                        dis.emit();
+                    }
+                    catch(Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+
+                }
+                else{
+                    
+                }
+                changeValues.remove(value);
+            }
+        }
+    }
+    public ArrayList<Coin> getCoinChange()
+    {
+        return coinsChange;
+    }
+    public ArrayList<Bill> getBillChange()
+    {
+        return billsChange;
+    }
+    
     @Override
     public void reactToEnabledEvent(AbstractDevice<? extends AbstractDeviceObserver> device) {
 
@@ -89,12 +131,15 @@ public class PayWithCash extends Pay implements BillDispenserObserver, BillValid
     public void reactToBillRemovedEvent(BillDispenser dispenser, Bill bill) {
     	
     	// station.billOutput.removeDanglingBill();
-
+        billsChange.add(bill);
     }
 
     @Override
     public void reactToBillsLoadedEvent(BillDispenser dispenser, Bill... bills) {
-
+        for(Bill b : bills)
+        {
+            changeValues.add(new BigDecimal(b.getValue()));
+        }
     }
 
     @Override
@@ -107,20 +152,12 @@ public class PayWithCash extends Pay implements BillDispenserObserver, BillValid
     	
 		PurchasedItems.addAmountPaid(new BigDecimal(value));
 
-    	if (PurchasedItems.getAmountLeftToPay().compareTo(new BigDecimal(0)) > 0) {
-    		for (int i : station.billDenominations) {
-    			this.billValues.add(i);
-    			this.billAmount.put(i, station.billDispensers.get(i).size());
-    		}
-
-    		for (BigDecimal i : station.coinDenominations) {
-    			this.coinValues.add(i);
-    			this.coinAmount.put(i, station.coinDispensers.get(i).size());
-    		}
+		// If the AmountLeftToPay < 0 => There is a change need to be returned => call PassChange
+    	if (PurchasedItems.getAmountLeftToPay().compareTo(new BigDecimal(0)) < 0) {
+    		BigDecimal change = PurchasedItems.getAmountLeftToPay().abs();
+    		PassChange(change);
     	}
-
-    	// Then pass to dp by Vic to see if we have enough change and emit
-
+    	
     }
 
     @Override
@@ -134,40 +171,13 @@ public class PayWithCash extends Pay implements BillDispenserObserver, BillValid
 		// TODO Auto-generated method stub
 		PurchasedItems.addAmountPaid(value);
 
-		if (PurchasedItems.getAmountLeftToPay().compareTo(new BigDecimal(0)) > 0) {
-    		for (int i : station.billDenominations) {
-    			this.billValues.add(i);
-    			this.billAmount.put(i, station.billDispensers.get(i).size());
-    		}
-
-    		for (BigDecimal i : station.coinDenominations) {
-    			this.coinValues.add(i);
-    			this.coinAmount.put(i, station.coinDispensers.get(i).size());
-    		}
+		// If the AmountLeftToPay < 0 => There is a change need to be returned => call PassChange
+    	if (PurchasedItems.getAmountLeftToPay().compareTo(new BigDecimal(0)) < 0) {
+    		BigDecimal change = PurchasedItems.getAmountLeftToPay().abs();
+    		PassChange(change);
     	}
-
-
-		// Then pass to dp by Vic to see if we have enough change and emit
-
-
-//		// While the amount to pay is >0, in other words, it is needed to provide changes:
-//    	while (amountPaid.compareTo(amountDue) > 0) {
-//    		// I want to loop from the largest one but don't know how to sort the hashmap tbh
-//    		for (Entry<BigDecimal, CoinDispenser> entry : this.station.coinDispensers.entrySet()) {
-//    			//coin = new Coin(entry.getKey(), "CAD");
-//    			coin = new Coin(entry.getKey(), tempcurrency);
-//    			try {
-//					entry.getValue().emit();
-//					// changes sth to amountDue/amountPaid to avoid infinite loop
-//					// amountDue = amountDue.subtract(BigDecimal.valueOf(entry.getKey()));
-//				} catch (DisabledException | EmptyException | OverloadException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//    		}
-//    	}
-
-	}
+    	
+    }
 
 	@Override
 	public void reactToInvalidCoinDetectedEvent(CoinValidator validator) {
@@ -198,13 +208,16 @@ public class PayWithCash extends Pay implements BillDispenserObserver, BillValid
 	@Override
 	public void reactToCoinRemovedEvent(CoinDispenser dispenser, Coin coin) {
 		// TODO Auto-generated method stub
-		
+		coinsChange.add(coin);
 	}
 
 	@Override
 	public void reactToCoinsLoadedEvent(CoinDispenser dispenser, Coin... coins) {
 		// TODO Auto-generated method stub
-		
+		for(Coin c: coins)
+        {
+            changeValues.add(c.getValue());
+        }
 	}
 
 	@Override
