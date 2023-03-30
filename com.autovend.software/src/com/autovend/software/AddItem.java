@@ -1,8 +1,10 @@
 package com.autovend.software;
 
 import com.autovend.devices.SelfCheckoutStation;
+import com.autovend.software.observers.AddItemObserver;
+import com.autovend.software.PurchasedItems;
 
-public class AddItem {
+public abstract class AddItem {
 	
 	SelfCheckoutStation check;
 	
@@ -10,7 +12,7 @@ public class AddItem {
 		this.check = scs;
 	}
 	
-	public void additem() {
-		
+	public void addBag(Bag bag) {
+		PurchasedItems.addBag(bag);
 	}
 }

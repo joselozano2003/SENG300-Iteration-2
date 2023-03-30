@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import com.autovend.devices.AbstractDevice;
 import com.autovend.devices.SelfCheckoutStation;
 import com.autovend.devices.SimulationException;
+import com.autovend.software.observers.PayObserver;
 
 
 public abstract class Pay extends AbstractDevice<PayObserver> {

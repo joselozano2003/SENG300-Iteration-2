@@ -18,10 +18,10 @@
  * Testing for PayWithCredit and PayWithDebit, specifically, when paying with tap, insert and swipe
  * the test can all pass, but because of the hardwares randomize fail feature, such as magnetic strip
  * not working the test will fail, but all test are able to pass. if running the tests for the first time
- * and all of them do not pass, please keep running them until all of them pass, this mainly due to the given 
- * hardwares randomness as mentioned above. 
- * 
- * The testing for insufficient balance or credit the asserts are to assure that nothing changes and the card provider 
+ * and all of them do not pass, please keep running them until all of them pass, this mainly due to the given
+ * hardwares randomness as mentioned above.
+ *
+ * The testing for insufficient balance or credit the asserts are to assure that nothing changes and the card provider
  * should negate the request
  */
 
@@ -31,6 +31,7 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Currency;
 import java.util.GregorianCalendar;
@@ -50,7 +51,7 @@ import com.autovend.software.PayWithCard;
 import com.autovend.software.PurchasedItems;
 
 public class PartiallyPaidTest {
-	
+
 	private SelfCheckoutStation scs;
 	BigDecimal milkPrice = new BigDecimal(2.50);
 	BigDecimal amountToPay;
@@ -58,8 +59,8 @@ public class PartiallyPaidTest {
     Numeral[] nMilk = {Numeral.one, Numeral.two, Numeral.three, Numeral.four};
     Barcode barcodeMilk = new Barcode(nMilk);
 	BarcodedProduct milk = new BarcodedProduct(barcodeMilk,"milk description",milkPrice,2.00);
-	
-	
+
+
 	Calendar exipery = new GregorianCalendar(2025, Calendar.OCTOBER, 31);
 	CardIssuer company = new CardIssuer("TD");
 	CardIssuer company2 = new CardIssuer("BMO");
@@ -78,19 +79,21 @@ public class PartiallyPaidTest {
 	private double expectedBaggingWeight;
 	private ScanItems scanItems;
 	private PurchasedItems itemsPurchased;
+	private ArrayList<BarcodedProduct> itemList;
 	private boolean scanFailed1, scanFailed2, scanFailed3;
 
-	// initializing some barcodes to use during tests
 	Numeral[] n = {Numeral.one, Numeral.two, Numeral.three};
 	Numeral[] m = {Numeral.two, Numeral.three, Numeral.one};
 	Numeral[] k = {Numeral.three, Numeral.two, Numeral.one};
 	Barcode b1 = new Barcode(n);
 	Barcode b2 = new Barcode(m);
 	Barcode b3 = new Barcode(k);
-	
+	// initializing some barcodes to use during tests
+
 @Before
 public void setUp() {
-	
+
+
 	Currency currency = Currency.getInstance("CAD");
 	int[] billDom = {5,10,20};
 	BigDecimal[] coinDom = {BigDecimal.valueOf(0.05), BigDecimal.valueOf(0.10),BigDecimal.valueOf(0.25)};
@@ -103,6 +106,7 @@ public void setUp() {
 	expectedBaggingWeight = 0.0;
 
 	// initialize a few prices8
+	price1 = new BigDecimal(2.00);
 	price2 = new BigDecimal(3.00);
 	price3 = new BigDecimal(4.50);
 
@@ -120,15 +124,17 @@ public void setUp() {
 	scanFailed2 = false;
 	scanFailed3 = false;
 
+
+
 	//initialize some products
 	itemProduct1 = new BarcodedProduct(b1, description1, price1, weight1);
 	itemProduct2 = new BarcodedProduct(b2, description2, price2, weight2);
-	itemProduct3 = new BarcodedProduct(b3, description3, price3, weight3);
+	//itemProduct3 = new BarcodedProduct(b3, description3, price3, weight3);
 
 	// initialize some units associated with the barcodes
 	unitItem1 = new BarcodedUnit(b1, weight1);
 	unitItem2 = new BarcodedUnit(b2, weight2);
-	unitItem3 = new BarcodedUnit(b3, weight3);
+	//unitItem3 = new BarcodedUnit(b3, weight3);
 
 	// add the products to the database to access
 	ProductDatabases.BARCODED_PRODUCT_DATABASE.put(b1, itemProduct1);
@@ -185,6 +191,4 @@ public void setUp() {
 
 		assertFalse(PurchasedItems.isPaid());
 	}
-
-	
 }
