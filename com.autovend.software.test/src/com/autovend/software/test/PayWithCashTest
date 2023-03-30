@@ -1,0 +1,134 @@
+package com.autovend.software.test;
+import static org.junit.Assert.*;
+import org.junit.Test;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.Currency;
+import com.autovend.*;
+import com.autovend.software.ScanItems;
+import org.junit.*;
+import org.junit.Before;
+import org.junit.Test;
+import com.autovend.devices.SelfCheckoutStation;
+import com.autovend.devices.SimulationException;
+import com.autovend.external.CardIssuer;
+import com.autovend.products.BarcodedProduct;
+import com.autovend.software.PayWithCash;
+import com.autovend.software.PurchasedItems;
+import com.autovend.devices.BillValidator;
+import com.autovend.devices.CoinValidator;
+import com.autovend.devices.BillDispenser;
+
+
+public class PayWithCashTest {
+	@Test
+	public void testReactToValidBillDetectedEvent() {
+	    SelfCheckoutStation station = new SelfCheckoutStation(null, null, null, 0, 0);
+	    PayWithCash payWithCash = new PayWithCash(station);
+	    BillValidator validator = new BillValidator(null, null);
+	    int billValue = 5;
+	    Currency currency = Currency.getInstance("CAD");
+	    BigDecimal expectedAmountPaid = new BigDecimal(billValue);
+	    PurchasedItems.setAmountPaid(expectedAmountPaid);
+	    payWithCash.reactToValidBillDetectedEvent(validator, currency, billValue);
+	    BigDecimal actualAmountPaid = PurchasedItems.getAmountPaid();
+	    assertEquals(expectedAmountPaid, actualAmountPaid);
+	}
+	@Test
+	public void testReactToValidCoinDetectedEvent() {
+	    SelfCheckoutStation station = new SelfCheckoutStation(null, null, null, 0, 0);
+	    PayWithCash payWithCash = new PayWithCash(station);
+	    CoinValidator validator = new CoinValidator(null, null);
+	    BigDecimal coinValue = new BigDecimal("0.25");
+	    Currency currency = Currency.getInstance("CAD");
+
+	    BigDecimal expectedAmountPaid = coinValue;
+	    PurchasedItems.setAmountPaid(expectedAmountPaid);
+
+	    payWithCash.reactToValidCoinDetectedEvent(validator, coinValue);
+
+	    BigDecimal actualAmountPaid = PurchasedItems.getAmountPaid();
+	    assertEquals(expectedAmountPaid, actualAmountPaid);
+	}
+	@Test
+	public void testReactToBillAddedEvent() {
+	    SelfCheckoutStation station = new SelfCheckoutStation(null, null, null, 0, 0);
+	    PayWithCash payWithCash = new PayWithCash(station);
+	    BillDispenser dispenser = new BillDispenser(0);
+	    int billValue = 10;
+
+	    Map<Integer, Integer> expectedBillAmount = new HashMap<>();
+	    expectedBillAmount.put(billValue, 1);
+
+	    payWithCash.reactToBillAddedEvent(dispenser, new Bill(billValue, null));
+
+	    Map<Integer, Integer> actualBillAmount = payWithCash.getBillAmount();
+	    assertEquals(expectedBillAmount, actualBillAmount);
+	}
+	@Test
+	public void testReactToBillRemovedEvent() {
+	    SelfCheckoutStation station = new SelfCheckoutStation(null, null, null, 0, 0);
+	    PayWithCash payWithCash = new PayWithCash(station);
+	    BillDispenser dispenser = new BillDispenser(0);
+	    int billValue = 20;
+
+	    dispenser.addBill(new Bill(billValue)); // need help in fixing this syntax
+	    payWithCash.reactToBillAddedEvent(dispenser, new Bill(billValue, null));
+
+	    Map<Integer, Integer> expectedBillAmount = new HashMap<>();
+	    expectedBillAmount.put(billValue, 0);
+
+	    payWithCash.reactToBillRemovedEvent(dispenser, new Bill(billValue));
+
+	    Map<Integer, Integer> actualBillAmount = payWithCash.getBillAmount();
+	    assertEquals(expectedBillAmount, actualBillAmount);
+	}
+	@Test
+	public void testValidBillDetected() {
+	    BigDecimal amountLeftToPay = new BigDecimal("10.00");
+	    PurchasedItems.setAmountPaid(amountLeftToPay);
+	    BigDecimal expectedAmountPaid = new BigDecimal("10.00");
+	    BillValidator billValidator = new BillValidator(null, null);
+	    PayWithCash payWithCash = new PayWithCash(null); // might have to create a stub for self checkout station
+	    billValidator.register(payWithCash);
+	    Currency currency = Currency.getInstance("CAD");
+	    int value = 10;
+	    billValidator.accept(new Bill(value, currency));
+	    assertEquals(expectedAmountPaid, PurchasedItems.getAmountPaid());
+	    assertEquals(new BigDecimal("0.00"), PurchasedItems.getAmountLeftToPay());
+	}
+	@Test
+	public void testValidCoinDetected() {
+	    BigDecimal amountLeftToPay = new BigDecimal("0.50");
+	    PurchasedItems.setAmountPaid(amountLeftToPay);
+	    BigDecimal expectedAmountPaid = new BigDecimal("0.50");
+	    CoinValidator coinValidator = new CoinValidator(null, null);
+	    PayWithCash payWithCash = new PayWithCash(null); // might have to create a stub for self checkout station
+	    coinValidator.register(payWithCash);
+	    BigDecimal value = new BigDecimal("0.50");
+	    coinValidator.accept(new Coin(value));
+	    assertEquals(expectedAmountPaid, PurchasedItems.getAmountPaid());
+	    assertEquals(new BigDecimal("0.00"), PurchasedItems.getAmountLeftToPay());
+	}
+	@Test
+	public void testInvalidBillDetected() {
+	    BillValidator billValidator = new BillValidator(null, null);
+	    PayWithCash payWithCash = new PayWithCash(null);// create a stub for mock station
+	    billValidator.register(payWithCash);
+	    billValidator.reject(); // need syntax fix
+	}
+
+	@Test
+	public void testInvalidCoinDetected() {
+	    CoinValidator coinValidator = new CoinValidator(null, null);
+	    PayWithCash payWithCash = new PayWithCash(null);
+	    coinValidator.register(payWithCash);
+	    BigDecimal invalidValue = new BigDecimal("0.03");
+	    coinValidator.accept(new Coin(invalidValue, null));
+	}
+
+	
+
+	
+
+}
