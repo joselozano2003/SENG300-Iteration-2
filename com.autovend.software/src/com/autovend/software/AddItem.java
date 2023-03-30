@@ -1,5 +1,16 @@
 package com.autovend.software;
 
-public class AddItem {
+import com.autovend.devices.SelfCheckoutStation;
 
+public class AddItem {
+	
+	SelfCheckoutStation check;
+	
+	public AddItem(SelfCheckoutStation scs) {
+		this.check = scs;
+	}
+	
+	public void additem() {
+		
+	}
 }

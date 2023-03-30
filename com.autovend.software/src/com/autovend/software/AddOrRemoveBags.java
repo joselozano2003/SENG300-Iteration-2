@@ -14,7 +14,8 @@ public class AddOrRemoveBags extends AddItem{
 	public BigDecimal price = new BigDecimal("0.25");
 	public double weight = 0.05;
 	public PurchasedItems purchase;
-	public AddOrRemoveBags() {
+	public AddOrRemoveBags(SelfCheckoutStation check) {
+		super(check);
 		bags = new ArrayList<Bag>();
 		ownbags = 0;
 		storebags = 0;
