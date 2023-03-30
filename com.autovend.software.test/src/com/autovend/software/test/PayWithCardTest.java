@@ -174,15 +174,92 @@ public void testDebitTap() throws IOException {
 
 
 @Test
-public void testDebitInsert() {
-	Assert.assertEquals(new BigDecimal(0), PurchasedItems.getAmountPaid());
+public void testDebitInsert() throws IOException {
+	
+	PayWithCard PayWithDebit = new PayWithCard(scs,company);
+	scs.cardReader.register(PayWithDebit);
+	scs.mainScanner.scan(unitItem1);
+	scs.baggingArea.add(unitItem1);
+
+	DebitCard Debit = new DebitCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);
+	company.addCardData("0234567890223451","DEBIT",exipery,"123",BigDecimal.valueOf(100));
+	scs.cardReader.insert(Debit,"1234");
+
+	try {
+		PayWithDebit.pay(BigDecimal.valueOf(2.5));
+
+	} catch (SimulationException e) {
+		e.printStackTrace();
+
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+
+	Assert.assertEquals(new BigDecimal(2.50), PurchasedItems.getAmountPaid());
+}
+
+
+
+@Test
+public void testDebitSwipe() throws IOException {
+	PayWithCard PayWithDebit = new PayWithCard(scs,company);
+	scs.cardReader.register(PayWithDebit);
+	scs.mainScanner.scan(unitItem1);
+	scs.baggingArea.add(unitItem1);
+
+	DebitCard Debit = new DebitCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);
+	company.addCardData("0234567890223451","DEBIT",exipery,"123",BigDecimal.valueOf(100));
+	scs.cardReader.swipe(Debit,null);
+
+	try {
+		PayWithDebit.pay(BigDecimal.valueOf(2.5));
+
+	} catch (SimulationException e) {
+		e.printStackTrace();
+
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+
+	Assert.assertEquals(new BigDecimal(2.50), PurchasedItems.getAmountPaid());
+}
+
+@Test
+public void testDebitTapNotEnough() throws IOException {
+	PayWithCard PayWithDebit = new PayWithCard(scs,company);
+	scs.cardReader.register(PayWithDebit);
+	scs.mainScanner.scan(unitItem1);
+	scs.baggingArea.add(unitItem1);
+
+	DebitCard Debit = new DebitCard("DEBIT", "0234567890223451", "debit", "123", "1234", true, true);
+	company.addCardData("0234567890223451","DEBIT",exipery,"123",BigDecimal.valueOf(1));
+	scs.cardReader.swipe(Debit,null);
+
+	try {
+		PayWithDebit.pay(BigDecimal.valueOf(2.5));
+
+	} catch (SimulationException e) {
+		e.printStackTrace();
+
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+
+	Assert.assertEquals(new BigDecimal(1.5), PurchasedItems.getAmountLeftToPay());
+	Assert.assertEquals(new BigDecimal(1), PurchasedItems.getAmountPaid());
+}
+
+
+@Test
+public void testDebitInsertNotEnough() {
 
 }
 
 @Test
-public void testDebitSwipe() {
+public void testDebitSwipeNotEnough() {
 
 }
+
 
 @Test
 public void testCreditTap() {
@@ -199,19 +276,7 @@ public void testCreditSwipe() {
 
 }
 
-@Test
-public void testDebitTapNotEnough() {
 
-}
-@Test
-public void testDebitInsertNotEnough() {
-
-}
-
-@Test
-public void testDebitSwipeNotEnough() {
-
-}
 
 @Test
 public void testCreditTapNotEnough() {
