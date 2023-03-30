@@ -16,6 +16,7 @@ public abstract class AddItem {
         {
             PurchasedItems.addBarcodedProduct(product);
         }
+		// dont need for now
         else if(product instanceof PLUCodedProduct)
         {
 
