@@ -3,22 +3,16 @@ package com.autovend.software;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Currency;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import com.autovend.Bill;
 import com.autovend.Coin;
 import com.autovend.devices.AbstractDevice;
 import com.autovend.devices.BillDispenser;
-import com.autovend.devices.BillSlot;
 import com.autovend.devices.BillValidator;
 import com.autovend.devices.CoinDispenser;
 import com.autovend.devices.CoinValidator;
-import com.autovend.devices.DisabledException;
-import com.autovend.devices.EmptyException;
-import com.autovend.devices.OverloadException;
 import com.autovend.devices.SelfCheckoutStation;
 import com.autovend.devices.observers.AbstractDeviceObserver;
 import com.autovend.devices.observers.BillDispenserObserver;
@@ -29,18 +23,15 @@ import com.autovend.devices.observers.CoinValidatorObserver;
 /**
  * Class that allows customer to pay with cash.
  *
- *
  */
 public class PayWithCash extends Pay implements BillDispenserObserver, BillValidatorObserver, CoinDispenserObserver, CoinValidatorObserver {
 
-	private BigDecimal amountToPay;
     public final int[] billDenominations;
 
 	private final Map<Integer, BillDispenser> billDispensers;
 
 	private final List<BigDecimal> coinDenominations;
 	private final Map<BigDecimal, CoinDispenser> coinDispensers;
-	//private Currency tempcurrency = Currency.getInstance("CAD");
     private ArrayList<BigDecimal> changeValues;
     private ArrayList<Bill> billsChange;
     private ArrayList<Coin> coinsChange;
@@ -63,9 +54,8 @@ public class PayWithCash extends Pay implements BillDispenserObserver, BillValid
     
     public void PassChange(BigDecimal change) {
 		ArrayList<BigDecimal> res = ChangeCalculator.calculateChange(changeValues, change);
-        for(value : res)
+        for(BigDecimal value : res)
         {   
-            int billVal = intValue(res);
             if(coinDispensers.containsKey(value))
             {
                 CoinDispenser dis = coinDispensers.get(value);
@@ -75,11 +65,12 @@ public class PayWithCash extends Pay implements BillDispenserObserver, BillValid
                 }
                 catch(Exception e)
                 {
-                    
+                    //print stack trace
+                    e.printStackTrace();
                 }
             }
             else{
-                int billVal = intValue(res);
+                int billVal = value.intValue();
                 if(billDispensers.containsKey(billVal))
                 {
                     BillDispenser dis = billDispensers.get(billVal);
@@ -89,14 +80,14 @@ public class PayWithCash extends Pay implements BillDispenserObserver, BillValid
                     }
                     catch(Exception e)
                     {
-
+                        e.printStackTrace();
                     }
 
                 }
                 else{
                     
                 }
-                remove(val);
+                changeValues.remove(value);
             }
         }
     }
@@ -106,7 +97,7 @@ public class PayWithCash extends Pay implements BillDispenserObserver, BillValid
     }
     public ArrayList<Bill> getBillChange()
     {
-        return biilsChange;
+        return billsChange;
     }
     
     @Override
@@ -145,7 +136,7 @@ public class PayWithCash extends Pay implements BillDispenserObserver, BillValid
 
     @Override
     public void reactToBillsLoadedEvent(BillDispenser dispenser, Bill... bills) {
-        for(b : bills)
+        for(Bill b : bills)
         {
             changeValues.add(new BigDecimal(b.getValue()));
         }
@@ -223,7 +214,7 @@ public class PayWithCash extends Pay implements BillDispenserObserver, BillValid
 	@Override
 	public void reactToCoinsLoadedEvent(CoinDispenser dispenser, Coin... coins) {
 		// TODO Auto-generated method stub
-		for(c: coins)
+		for(Coin c: coins)
         {
             changeValues.add(c.getValue());
         }
