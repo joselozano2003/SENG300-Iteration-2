@@ -1,5 +1,3 @@
-
-
 package com.autovend.software;
 
 import com.autovend.products.BarcodedProduct;
@@ -11,52 +9,93 @@ import java.util.ArrayList;
 public class PurchasedItems{
 
     private static ArrayList<BarcodedProduct> listOfProducts;
-    private BigDecimal totalPrice;
-    private double totalExpectedWeight;
-    private BigDecimal change;
-    private BigDecimal amountPaid;
+    private static BigDecimal totalPrice;
+    private static double totalExpectedWeight;
+    private static BigDecimal change;
+    private static BigDecimal amountPaid;
+    private static boolean isPaid;
 
-    public PurchasedItems(){
+    static {
         listOfProducts = new ArrayList<>();
         totalPrice = new BigDecimal(0);
         amountPaid = new BigDecimal(0);
         totalExpectedWeight = 0;
-
         change = new BigDecimal(0);
+        isPaid = false;
     }
 
-    public void addProduct(BarcodedProduct product){
+    public static void addProduct(BarcodedProduct product){
         listOfProducts.add(product);
         totalPrice = totalPrice.add(product.getPrice());
         totalExpectedWeight += product.getExpectedWeight();
+        if (totalPrice.compareTo(amountPaid) >= 0) {
+            isPaid = false;
+        }
+
     }
 
-    public ArrayList<BarcodedProduct> getListOfProducts(){
+    public static ArrayList<BarcodedProduct> getListOfProducts(){
         return listOfProducts;
     }
 
     // I think this is not necessary for this iteration but will be useful for future ones
-    public void removeProduct(BarcodedProduct product){
+    public static void removeProduct(BarcodedProduct product){
         listOfProducts.remove(product);
         totalPrice = totalPrice.subtract(product.getPrice());
         totalExpectedWeight -= product.getExpectedWeight();
     }
 
-    public BigDecimal getTotalPrice(){
+    public static BigDecimal getTotalPrice(){
         return totalPrice;
     }
 
-    public double getTotalExpectedWeight(){
+    public static double getTotalExpectedWeight(){
         return totalExpectedWeight;
     }
 
-    public void setChange(BigDecimal change){
-        this.change = change;
+    public static void setChange(BigDecimal amount){
+        change = amount;
     }
 
-    public BigDecimal getChange(){
+    public static BigDecimal getChange(){
         return change;
     }
 
-}
 
+    public static void addAmountPaid(BigDecimal amount) {
+        amountPaid = amountPaid.add(amount);
+        if (amountPaid.compareTo(totalPrice) >= 0) {
+        	isPaid = true;
+        }
+    }
+
+    public static boolean isPaid() {
+    	return isPaid;
+    }
+
+    public static BigDecimal getAmountPaid(){
+        return amountPaid;
+    }
+
+    public static BigDecimal getAmountLeftToPay() {
+    	return totalPrice.subtract(amountPaid);
+    }
+
+
+    // This method is used for testing purposes ONLY for scanItemsTest
+    public static void setAmountPaid(BigDecimal amount) {
+    	amountPaid = amount;
+        if (amountPaid.compareTo(totalPrice) >= 0) {
+            isPaid = true;
+        }
+    }
+
+    public static void reset() {
+    	listOfProducts = new ArrayList<>();
+        totalPrice = new BigDecimal(0);
+        amountPaid = new BigDecimal(0);
+        totalExpectedWeight = 0;
+        change = new BigDecimal(0);
+        isPaid = false;
+    }
+}
