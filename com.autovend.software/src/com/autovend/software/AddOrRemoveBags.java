@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 import com.autovend.devices.*;
 
-
+// extend the Parent class
 public class AddOrRemoveBags extends AddItem{
     ArrayList<Bag> listOfStoreBags;
 
