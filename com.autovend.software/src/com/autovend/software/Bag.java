@@ -11,6 +11,9 @@ public class Bag extends Product {
 
 	public Bag(String description, BigDecimal price, double expectedWeight) {
 		super(price, true);
+		if (price == null || expectedWeight <= 0 || description == null){
+			throw new IllegalArgumentException("Parameters cannot be null");
+		}
 		this.bagWeight = expectedWeight;
 		this.description = description;
 	}

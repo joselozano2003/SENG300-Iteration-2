@@ -1,133 +1,96 @@
-//package com.autovend.software.test;
-//
-//import static org.junit.Assert.*;
-//import java.math.BigDecimal;
-//import org.junit.*;
-//import com.autovend.*;
-//import com.autovend.devices.OverloadException;
-//import com.autovend.devices.SimulationException;
-//import com.autovend.products.BarcodedProduct;
-//import com.autovend.software.*;
-//public class BagTest {
-//	Bag bag;
-//	//sets up a Bag for testing
-//	@Before
-//	public void setup() {
-//		Numeral numeral = Numeral.valueOf("one");
-//		Barcode barcode = new Barcode(numeral);
-//		String string = "test bag";
-//		BigDecimal price = BigDecimal.valueOf(0.5);
-//		double weight = 0.1;
-//		boolean purchased = true;
-//		bag = new Bag(barcode, string, price, weight, purchased);
-//	}
-//	@After
-//	public void tearDown() {
-//		bag = null;
-//		PurchasedItems.reset();
-//	}
-//	//tests if the bag was constructed correctly
-//	@Test
-//	public void bagConstructorTest1() {
-//		assertEquals(Numeral.valueOf("one"), bag.getBarcode().getDigitAt(0));
-//		assertEquals(bag.getDescription(), "test bag");
-//		assertEquals(bag.getPrice(), BigDecimal.valueOf(0.5));
-//		assertEquals(bag.getExpectedWeight(), 0.1, 0.0);
-//		assertTrue(bag.gettype());
-//	}
-//	//tests if an item with too much weight correctly throws an exception
-//	@Test
-//	public void addItemTest1() {
-//		boolean failed = false;
-//		PurchasedItems item = new PurchasedItems();
-//		Numeral num = Numeral.valueOf("two");
-//		Barcode bar = new Barcode(num);
-//		String str = "test item";
-//		BigDecimal price = BigDecimal.valueOf(0.5);
-//		double weight = 100000;
-//		BarcodedProduct product = new BarcodedProduct(bar,str,price,weight);
-//		item.addProduct(product);
-//		try {
-//			bag.additem(item);
-//		} catch (SimulationException e) {
-//			failed = true;
-//		} catch (OverloadException e) {}
-//		assertTrue(failed);
-//	}
-//	//tests if an item is added correctly
-//	@Test
-//	public void addItemTest2() {
-//		PurchasedItems item = new PurchasedItems();
-//		Numeral num = Numeral.valueOf("three");
-//		Barcode bar = new Barcode(num);
-//		String str = "test item";
-//		BigDecimal price = BigDecimal.valueOf(0.5);
-//		double weight = 10;
-//		BarcodedProduct product = new BarcodedProduct(bar,str,price,weight);
-//		item.addProduct(product);
-//		try {
-//			bag.additem(item);
-//		} catch (OverloadException e) {}
-//		assertEquals(bag.baggage.get(0).getTotalExpectedWeight(), 10, 0);
-//	}
-//	//tests if an exception is thrown when an item is attempted to be removed from an empty bag
-//	@Test
-//	public void removeItemTest1() {
-//		boolean failed = false;
-//		try {
-//			bag.removeitem(null);
-//		}catch(SimulationException e) {
-//			failed = true;
-//		}
-//		assertTrue(failed);
-//	}
-//	//tests if an item is removed correctly
-//	@Test
-//	public void removeItemTest2() {
-//		PurchasedItems item = new PurchasedItems();
-//		Numeral num = Numeral.valueOf("four");
-//		Barcode bar = new Barcode(num);
-//		String str = "test item";
-//		BigDecimal price = BigDecimal.valueOf(0.5);
-//		double weight = 10;
-//		BarcodedProduct product = new BarcodedProduct(bar,str,price,weight);
-//		item.addProduct(product);
-//		try {
-//			bag.additem(item);
-//		} catch (OverloadException e) {}
-//		bag.removeitem(item);
-//		assertTrue(bag.baggage.isEmpty());
-//	}
-//	//tests if an exception is thrown when a bag is attempted to be emptied from an empty bag
-//	@Test
-//	public void emptyBagTest1() {
-//		boolean failed = false;
-//		try {
-//			bag.emptyBag();
-//		}catch(SimulationException e) {
-//			failed = true;
-//		}
-//		assertTrue(failed);
-//	}
-//	//tests if a bag is emptied correctly
-//	@Test
-//	public void emptyBagTest2() {
-//		PurchasedItems item = new PurchasedItems();
-//		Numeral num = Numeral.valueOf("five");
-//		Barcode bar = new Barcode(num);
-//		String str = "test item";
-//		BigDecimal price = BigDecimal.valueOf(0.5);
-//		double weight = 10;
-//		BarcodedProduct product = new BarcodedProduct(bar,str,price,weight);
-//		item.addProduct(product);
-//		try {
-//			bag.additem(item);
-//		} catch (OverloadException e) {}
-//		bag.emptyBag();
-//		assertTrue(bag.baggage.isEmpty());
-//	}
-//
-//
-//
-//
-//}
+package com.autovend.software.test;
+
+import static org.junit.Assert.*;
+import java.math.BigDecimal;
+import org.junit.*;
+import com.autovend.devices.SimulationException;
+import com.autovend.software.*;
+public class BagTest {
+	Bag bag;
+    Bag reusableBagSmall;
+    Bag reusableBagMedium;
+    Bag reusableBagLarge;
+
+    Bag disposableBagSmall;
+    Bag disposableBagMedium;
+    Bag disposableBagLarge;
+	//sets up a Bag for testing
+	@Before
+	public void setup() {
+        reusableBagSmall = new Bag("Small Reusable Bag", new BigDecimal("0.25"), 0.1);
+        reusableBagMedium = new Bag("Medium Reusable Bag", new BigDecimal("0.50"), 0.2);
+        reusableBagLarge = new Bag("Large Reusable Bag", new BigDecimal("1"), 0.3);
+
+        disposableBagSmall = new Bag("Small Disposable Bag", new BigDecimal("0.25"), 0.1);
+        disposableBagMedium = new Bag("Medium Disposable Bag", new BigDecimal("0.50"), 0.2);
+        disposableBagLarge = new Bag("Large Disposable Bag", new BigDecimal("1"), 0.3);
+	}
+	@After
+	public void tearDown() {
+		bag = null;
+		reusableBagLarge = null;
+		reusableBagMedium = null;
+		reusableBagSmall = null;
+		disposableBagLarge = null;
+		disposableBagMedium = null;
+		disposableBagSmall = null;
+		PurchasedItems.reset();
+	}
+//	tests if the bag was constructed correctly
+	@Test
+	public void validBagConstructorTest() {
+        assertEquals(reusableBagSmall.getDescription(), "Small Reusable Bag");
+        assertEquals(reusableBagSmall.getPrice(), new BigDecimal("0.25"));
+        assertEquals(reusableBagSmall.getWeight(), 0.1, 0.0001);
+
+		assertEquals(reusableBagMedium.getDescription(), "Medium Reusable Bag");
+		assertEquals(reusableBagMedium.getPrice(), new BigDecimal("0.50"));
+		assertEquals(reusableBagMedium.getWeight(), 0.2, 0.0001);
+
+		assertEquals(reusableBagLarge.getDescription(), "Large Reusable Bag");
+		assertEquals(reusableBagLarge.getPrice(), new BigDecimal("1"));
+		assertEquals(reusableBagLarge.getWeight(), 0.3, 0.0001);
+
+		assertEquals(disposableBagSmall.getDescription(), "Small Disposable Bag");
+		assertEquals(disposableBagSmall.getPrice(), new BigDecimal("0.25"));
+		assertEquals(disposableBagSmall.getWeight(), 0.1, 0.0001);
+
+		assertEquals(disposableBagMedium.getDescription(), "Medium Disposable Bag");
+		assertEquals(disposableBagMedium.getPrice(), new BigDecimal("0.50"));
+		assertEquals(disposableBagMedium.getWeight(), 0.2, 0.0001);
+
+		assertEquals(disposableBagLarge.getDescription(), "Large Disposable Bag");
+		assertEquals(disposableBagLarge.getPrice(), new BigDecimal("1"));
+		assertEquals(disposableBagLarge.getWeight(), 0.3, 0.0001);
+    }
+
+	@Test
+	public void invalidBagConstructorTest() {
+		boolean failed = false;
+		try {
+			bag = new Bag(null, new BigDecimal("0.50"), 5);
+		} catch (IllegalArgumentException e) {
+			failed = true;
+		}
+		assertTrue(failed);
+
+		failed = false;
+		try {
+			bag = new Bag("test bag", null, 5);
+		} catch (SimulationException e) {
+			failed = true;
+		}
+		assertTrue(failed);
+
+		failed = false;
+
+		try {
+			bag = new Bag("test bag", new BigDecimal("0.50"), -5);
+		} catch (IllegalArgumentException e) {
+			failed = true;
+		}
+		assertTrue(failed);
+	}
+
+
+}
