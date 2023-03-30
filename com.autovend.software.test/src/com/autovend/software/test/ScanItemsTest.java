@@ -101,9 +101,6 @@ public class ScanItemsTest {
 		// create the station
 		selfCheckoutStation = new SelfCheckoutStation(currency, billDenominations, coinDenominations, maxScaleWeight, sensitivity);
 		
-		// initialize purchased items constructor
-		itemsPurchased = new PurchasedItems();
-		
 		// initialize constructor and add each product to the list of products being scanned
 		scanItems = new ScanItems(selfCheckoutStation);
 		
@@ -119,7 +116,7 @@ public class ScanItemsTest {
 	@After
 	public void tearDown() {
 		selfCheckoutStation = null;
-		itemsPurchased = null;
+		PurchasedItems.reset();
 	}
 	
 	@Test
