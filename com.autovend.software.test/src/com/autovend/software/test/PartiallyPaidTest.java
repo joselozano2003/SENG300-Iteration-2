@@ -94,7 +94,7 @@ public void setUp() {
 	Currency currency = Currency.getInstance("CAD");
 	int[] billDom = {5,10,20};
 	BigDecimal[] coinDom = {BigDecimal.valueOf(0.05), BigDecimal.valueOf(0.10),BigDecimal.valueOf(0.25)};
-	scs = new SelfCheckoutStation(currency, billDom, coinDom, 10000,2);
+	scs = new SelfCheckoutStation(currency, billDom, coinDom, 10000,1);
 
 
 	company.addCardData("1234567890123458","debit",exipery,"123",BigDecimal.valueOf(100));
@@ -102,8 +102,7 @@ public void setUp() {
 	expectedCartPrice = new BigDecimal(0);
 	expectedBaggingWeight = 0.0;
 
-	// initialize a few prices
-	price1 = new BigDecimal(2.00);
+	// initialize a few prices8
 	price2 = new BigDecimal(3.00);
 	price3 = new BigDecimal(4.50);
 
@@ -161,10 +160,31 @@ public void setUp() {
 
 }
 
-@Test
-public void testPartiallyWithCard() {
-	
-}
+	@Test
+	public void testPartiallyWithCard() {
+		PayWithCard PayWithCredit = new PayWithCard(scs,company);
+		scs.cardReader.register(PayWithCredit);
+		scs.mainScanner.scan(unitItem1);
+		scs.baggingArea.add(unitItem1);
+
+		CreditCard CreditTap = new CreditCard("Credit", "0234567890223451", "credit", "123", "1234", true, true);
+		company.addCardData("0234567890223451","Credit",exipery,"123",BigDecimal.valueOf(100));
+
+		try {
+			scs.cardReader.tap(CreditTap);
+		} catch (SimulationException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
+		assertTrue(PurchasedItems.isPaid());
+
+		scs.mainScanner.scan(unitItem2);
+		scs.baggingArea.add(unitItem2);
+
+		assertFalse(PurchasedItems.isPaid());
+	}
 
 	
 }
