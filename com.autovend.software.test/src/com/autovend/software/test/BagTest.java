@@ -24,6 +24,7 @@ public class BagTest {
 	@After
 	public void tearDown() {
 		bag = null;
+		PurchasedItems.reset();
 	}
 	//tests if the bag was constructed correctly
 	@Test
@@ -45,7 +46,7 @@ public class BagTest {
 		BigDecimal price = BigDecimal.valueOf(0.5);
 		double weight = 100000;
 		BarcodedProduct product = new BarcodedProduct(bar,str,price,weight);
-		item.addProduct(product);
+		PurchasedItems.addProduct(product);
 		try {
 			bag.additem(item);
 		} catch (SimulationException e) {
@@ -63,11 +64,11 @@ public class BagTest {
 		BigDecimal price = BigDecimal.valueOf(0.5);
 		double weight = 10;
 		BarcodedProduct product = new BarcodedProduct(bar,str,price,weight);
-		item.addProduct(product);
+		PurchasedItems.addProduct(product);
 		try {
 			bag.additem(item);
 		} catch (OverloadException e) {}
-		assertEquals(bag.baggage.get(0).getTotalExpectedWeight(), 10, 0);
+		assertEquals(PurchasedItems.getTotalExpectedWeight(), 10, 0);
 	}
 	//tests if an exception is thrown when an item is attempted to be removed from an empty bag
 	@Test
@@ -90,7 +91,7 @@ public class BagTest {
 		BigDecimal price = BigDecimal.valueOf(0.5);
 		double weight = 10;
 		BarcodedProduct product = new BarcodedProduct(bar,str,price,weight);
-		item.addProduct(product);
+		PurchasedItems.addProduct(product);
 		try {
 			bag.additem(item);
 		} catch (OverloadException e) {}
@@ -118,7 +119,7 @@ public class BagTest {
 			BigDecimal price = BigDecimal.valueOf(0.5);
 			double weight = 10;
 			BarcodedProduct product = new BarcodedProduct(bar,str,price,weight);
-			item.addProduct(product);
+			PurchasedItems.addProduct(product);
 			try {
 				bag.additem(item);
 			} catch (OverloadException e) {}
