@@ -1,6 +1,7 @@
 package com.autovend.software;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Currency;
 import java.util.HashMap;
 import java.util.List;
@@ -50,14 +51,83 @@ public class PayWithCash extends Pay implements BillDispenserObserver, BillValid
     public PayWithCash(SelfCheckoutStation station) {
         super(station);
 		PurchasedItems items = new PurchasedItems();
-		/*
-        if (amountToPay.compareTo(super.getAmountDue()) > 0) {
-			this.amountToPay = super.getAmountDue();
-		} else this.amountToPay = amountToPay;
-        this.billDispenser = billDispenser;
-        this.coinDispenser = coinDispenser;*/
+    }
+    
+    public void PassChange(BigDecimal c) {
+    	ArrayList<BigDecimal> d = new ArrayList<BigDecimal>();
+    	
+    	// Pass all bills in dispensers into arraylist
+    	for (int i : station.billDenominations) {
+    		if (i == 100) {
+    			d.add(new BigDecimal(100.00));
+    		}
+    		else if (i == 50) {
+    			d.add(new BigDecimal(50.00));
+    		}
+    		else if (i == 20) {
+    			d.add(new BigDecimal(20.00));
+    		}
+    		else if (i == 10) {
+    			d.add(new BigDecimal(10.00));
+    		}
+    		else if (i == 5) {
+    			d.add(new BigDecimal(5.00));
+    		}
+    	}
+    	
+    	// Pass all coins in dispensers into arraylist
+    	for (BigDecimal i : station.coinDenominations) {
+    		if (i == BigDecimal.valueOf(2.00)) {
+    			d.add(new BigDecimal(2.00));
+    		}
+    		else if (i == BigDecimal.valueOf(1.00)) {
+    			d.add(new BigDecimal(1.00));
+    		}
+    		else if (i == BigDecimal.valueOf(0.25)) {
+    			d.add(new BigDecimal(0.25));
+    		}
+    		else if (i == BigDecimal.valueOf(0.10)) {
+    			d.add(new BigDecimal(0.10));
+    		}
+    		else if (i == BigDecimal.valueOf(0.05)) {
+    			d.add(new BigDecimal(0.05));
+    		}
+    	}
+    	
+		ArrayList<BigDecimal> b = ChangeCalculator.calculateChange(d, c);
+		//then emit
+		EmitChange(b);
     }
 
+    public void EmitChange(ArrayList<BigDecimal> b) {
+    	for (BigDecimal i : b) {
+
+    		for (Map.Entry<Integer, BillDispenser> entry : this.station.billDispensers.entrySet()) {
+    			if (BigDecimal.valueOf(entry.getKey()) ==  i) {
+    				bill = new Bill(entry.getKey(), null);
+    				try {
+						entry.getValue().emit();
+					} catch (DisabledException | EmptyException | OverloadException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+    			}
+    		}
+    		
+    		for (Entry<BigDecimal, CoinDispenser> entry : this.station.coinDispensers.entrySet()) {
+    			if (entry.getKey() ==  i) {
+    				coin = new Coin(entry.getKey(), null);
+    				try {
+						entry.getValue().emit();
+    				} catch (DisabledException | EmptyException | OverloadException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+    			}
+    		}
+    	}
+    }
+    
     @Override
     public void reactToEnabledEvent(AbstractDevice<? extends AbstractDeviceObserver> device) {
 
@@ -107,20 +177,12 @@ public class PayWithCash extends Pay implements BillDispenserObserver, BillValid
     	
 		PurchasedItems.addAmountPaid(new BigDecimal(value));
 
-    	if (PurchasedItems.getAmountLeftToPay().compareTo(new BigDecimal(0)) > 0) {
-    		for (int i : station.billDenominations) {
-    			this.billValues.add(i);
-    			this.billAmount.put(i, station.billDispensers.get(i).size());
-    		}
-
-    		for (BigDecimal i : station.coinDenominations) {
-    			this.coinValues.add(i);
-    			this.coinAmount.put(i, station.coinDispensers.get(i).size());
-    		}
+		// If the AmountLeftToPay < 0 => There is a change need to be returned => call PassChange
+    	if (PurchasedItems.getAmountLeftToPay().compareTo(new BigDecimal(0)) < 0) {
+    		BigDecimal change = PurchasedItems.getAmountLeftToPay().abs();
+    		PassChange(change);
     	}
-
-    	// Then pass to dp by Vic to see if we have enough change and emit
-
+    	
     }
 
     @Override
@@ -134,40 +196,13 @@ public class PayWithCash extends Pay implements BillDispenserObserver, BillValid
 		// TODO Auto-generated method stub
 		PurchasedItems.addAmountPaid(value);
 
-		if (PurchasedItems.getAmountLeftToPay().compareTo(new BigDecimal(0)) > 0) {
-    		for (int i : station.billDenominations) {
-    			this.billValues.add(i);
-    			this.billAmount.put(i, station.billDispensers.get(i).size());
-    		}
-
-    		for (BigDecimal i : station.coinDenominations) {
-    			this.coinValues.add(i);
-    			this.coinAmount.put(i, station.coinDispensers.get(i).size());
-    		}
+		// If the AmountLeftToPay < 0 => There is a change need to be returned => call PassChange
+    	if (PurchasedItems.getAmountLeftToPay().compareTo(new BigDecimal(0)) < 0) {
+    		BigDecimal change = PurchasedItems.getAmountLeftToPay().abs();
+    		PassChange(change);
     	}
-
-
-		// Then pass to dp by Vic to see if we have enough change and emit
-
-
-//		// While the amount to pay is >0, in other words, it is needed to provide changes:
-//    	while (amountPaid.compareTo(amountDue) > 0) {
-//    		// I want to loop from the largest one but don't know how to sort the hashmap tbh
-//    		for (Entry<BigDecimal, CoinDispenser> entry : this.station.coinDispensers.entrySet()) {
-//    			//coin = new Coin(entry.getKey(), "CAD");
-//    			coin = new Coin(entry.getKey(), tempcurrency);
-//    			try {
-//					entry.getValue().emit();
-//					// changes sth to amountDue/amountPaid to avoid infinite loop
-//					// amountDue = amountDue.subtract(BigDecimal.valueOf(entry.getKey()));
-//				} catch (DisabledException | EmptyException | OverloadException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//    		}
-//    	}
-
-	}
+    	
+    }
 
 	@Override
 	public void reactToInvalidCoinDetectedEvent(CoinValidator validator) {
