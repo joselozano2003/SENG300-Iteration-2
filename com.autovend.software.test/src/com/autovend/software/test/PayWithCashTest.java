@@ -158,10 +158,6 @@ public class PayWithCashTest {
         d.add(new BigDecimal(10));
         d.add(new BigDecimal(50));
         ArrayList<BigDecimal> b = ChangeCalculator.calculateChange(d,new BigDecimal(51));
-        for(BigDecimal x: b)
-        {
-            System.out.println(x);
-        }
     }
 
     //Test to see if the functionality works if not paid all at once
