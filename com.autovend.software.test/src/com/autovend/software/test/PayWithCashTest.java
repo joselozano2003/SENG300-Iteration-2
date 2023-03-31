@@ -51,11 +51,14 @@ public class PayWithCashTest {
 
     private SelfCheckoutStation station;
     private BarcodedProduct product;
+    private BarcodedProduct anotherProduct;
     private Currency currency;
     private Bill bill;
     private Bill billTwenty;
     private Coin coin;
+    private Coin coinTwo;
     private CoinDispenser fiveCentDispenser;
+    private CoinDispenser twoDollarDispenser;
     private BillDispenser fiveDollarDispenser;
     private PayWithCash payWithCash;
 
@@ -73,13 +76,15 @@ public class PayWithCashTest {
         station = new SelfCheckoutStation(currency, billDenominations, coinDenominations,10,1);
 
         coin = new Coin(fiveCent,currency);
+        coinTwo = new Coin (toonie,currency);
         bill = new Bill(5,currency);
         billTwenty = new Bill(20,currency);
         BillDispenser fiveDollarDispenser = station.billDispensers.get(5);
         CoinDispenser fiveCentDispenser = station.coinDispensers.get(fiveCent);
 
         Barcode barcode = new Barcode(Numeral.zero, Numeral.two, Numeral.three, Numeral.two, Numeral.seven);
-        product = new BarcodedProduct(barcode,"product name", new BigDecimal("12.50"),1);
+        product = new BarcodedProduct(barcode,"product name", new BigDecimal("12.95"),1);
+        anotherProduct = new BarcodedProduct(barcode,"product name", new BigDecimal("1.95"),1);
 
 
     }
@@ -91,13 +96,16 @@ public class PayWithCashTest {
         PurchasedItems.reset();
     }
 
+    //Test completing a purchase using bills
     @Test
-    public void testEntirePayment() throws SimulationException, OverloadException {
+    public void testEntirePaymentWithBill() throws SimulationException, OverloadException {
         PayWithCash payWithCash = new PayWithCash(station);
         fiveCentDispenser = station.coinDispensers.get(new BigDecimal("0.05"));
+        twoDollarDispenser = station.coinDispensers.get(new BigDecimal("2"));
         fiveDollarDispenser = station.billDispensers.get(5);
         fiveDollarDispenser.load(bill,bill);
         fiveCentDispenser.load(coin,coin,coin,coin,coin,coin,coin,coin,coin,coin,coin);
+        twoDollarDispenser.load(coinTwo,coinTwo);
         //Would be nice to be able to compare changeValues to expected values
         PurchasedItems.addProduct(product);
         station.billValidator.accept(billTwenty);
@@ -107,9 +115,28 @@ public class PayWithCashTest {
         ArrayList<Coin> coinChange = new ArrayList<>();
         coinChange.add(coin);
         assertEquals(payWithCash.getCoinChange(),coinChange);
-
     }
 
+    //Test completing a purchase using coins
+    @Test
+    public void testEntirePaymentWithCoin() throws SimulationException, OverloadException {
+        PayWithCash payWithCash = new PayWithCash(station);
+        fiveCentDispenser = station.coinDispensers.get(new BigDecimal("0.05"));
+        fiveDollarDispenser = station.billDispensers.get(5);
+        fiveDollarDispenser.load(bill,bill);
+        fiveCentDispenser.load(coin,coin,coin,coin,coin,coin,coin,coin,coin,coin,coin);
+        //Would be nice to be able to compare changeValues to expected values
+        PurchasedItems.addProduct(anotherProduct);
+        station.coinValidator.accept(coinTwo);
+        ArrayList<Bill> billChange = new ArrayList<>();
+        billChange.add(bill);
+        assertEquals(payWithCash.getBillChange(),billChange);
+        ArrayList<Coin> coinChange = new ArrayList<>();
+        coinChange.add(coin);
+        assertEquals(payWithCash.getCoinChange(),coinChange);
+    }
+
+    //Displays a run through of getting the correct change for an expected value
     @Test
     public void calculateChangetest () {
         ArrayList<BigDecimal> d = new ArrayList<BigDecimal>();
@@ -126,6 +153,7 @@ public class PayWithCashTest {
         }
     }
 
+    //Test to see if the functionality works if not paid all at once
     @Test
     public void testPartialCashPayment() {
         PayWithCash payWithCash = new PayWithCash(station);
@@ -227,3 +255,4 @@ public class PayWithCashTest {
         payWithCash.reactToInvalidBillDetectedEvent(station.billValidator);
     }
 }
+
