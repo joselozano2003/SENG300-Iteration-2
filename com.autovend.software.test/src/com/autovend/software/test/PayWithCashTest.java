@@ -115,7 +115,7 @@ public class PayWithCashTest {
         station.billValidator.accept(billTwenty);
         //For some reason, when the accept method is called, it never calls reactToValidBillDetectedEvent/reactToCoinDetectedEvent
         //So in this test we call it manually
-        payWithCash.reacttoValidBillDetectedEvent(station.billValidator,currency, 20);
+        payWithCash.reactToValidBillDetectedEvent(station.billValidator,currency, 20);
         ArrayList<Bill> billChange = new ArrayList<>();
         billChange.add(bill);
         assertEquals(payWithCash.getBillChange(),billChange);
@@ -175,7 +175,7 @@ public class PayWithCashTest {
         BigDecimal expectedResult = new BigDecimal("7.95");
         //For some reason, when the accept method is called, it never calls reactToValidBillDetectedEvent/reactToCoinDetectedEvent
         //So in this test we call it manually
-        payWithCash.reacttoValidBillDetectedEvent(station.billValidator,currency, 5);
+        payWithCash.reactToValidBillDetectedEvent(station.billValidator,currency, 5);
         BigDecimal actualResult = PurchasedItems.getAmountLeftToPay();
         assertEquals(expectedResult,actualResult);
     }
