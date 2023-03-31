@@ -37,9 +37,9 @@ import java.util.Currency;
 import java.util.GregorianCalendar;
 
 import com.autovend.*;
+import com.autovend.devices.BillValidator;
 import com.autovend.external.ProductDatabases;
-import com.autovend.software.ScanItems;
-import com.autovend.software.WeightDiscrepancy;
+import com.autovend.software.*;
 import org.junit.*;
 import org.junit.Before;
 import org.junit.Test;
@@ -48,8 +48,6 @@ import com.autovend.devices.SelfCheckoutStation;
 import com.autovend.devices.SimulationException;
 import com.autovend.external.CardIssuer;
 import com.autovend.products.BarcodedProduct;
-import com.autovend.software.PayWithCard;
-import com.autovend.software.PurchasedItems;
 
 public class PartiallyPaidTest {
 
@@ -169,6 +167,13 @@ public void setUp() {
 
 }
 
+	@After
+	public void tearDown() {
+
+		PurchasedItems.reset();
+	}
+
+
 	@Test
 	public void testPartiallyWithCard() {
 		PayWithCard PayWithCredit = new PayWithCard(scs,company);
@@ -194,4 +199,42 @@ public void setUp() {
 
 		assertFalse(PurchasedItems.isPaid());
 	}
+
+	@Test
+	public void testPartiallyWithCard2() {
+		PayWithCard PayWithCredit2 = new PayWithCard(scs,company);
+		scs.cardReader.register(PayWithCredit2);
+		scs.mainScanner.scan(unitItem1);
+		scs.baggingArea.add(unitItem1);
+
+		CreditCard CreditTap2 = new CreditCard("Credit", "0234567890223451", "credit", "123", "1234", true, true);
+		company.addCardData("0234567890223451","Credit",exipery,"123",BigDecimal.valueOf(100));
+
+		try {
+			scs.cardReader.tap(CreditTap2);
+		} catch (SimulationException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
+		assertTrue(PurchasedItems.isPaid());
+
+		scs.mainScanner.scan(unitItem2);
+		scs.baggingArea.add(unitItem2);
+
+		assertFalse(PurchasedItems.isPaid());
+
+		try {
+			scs.cardReader.tap(CreditTap2);
+		} catch (SimulationException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
+		assertTrue(PurchasedItems.isPaid());
+	}
+
+
 }
