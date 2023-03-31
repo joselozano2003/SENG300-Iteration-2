@@ -1,6 +1,3 @@
-package com.autovend.software.test;
-
-import org.junit.*;
 /**
  * Members for Iteration 2:
  * Ethan Oke (30142180)
@@ -16,6 +13,7 @@ import org.junit.*;
  * Sara Dhuka (30124117)
  * Robert (William) Engel (30119608)
  */
+package com.autovend.software.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -66,7 +64,6 @@ public class PayWithCashTest {
     @Before
     public void setup() {
         Currency currency = Currency.getInstance(Locale.CANADA);
-        //Create self checkout station
         int[] billDenominations = {5, 10 , 15, 20, 50, 100};
         BigDecimal fiveCent = new BigDecimal("0.05");
         BigDecimal tenCent = new BigDecimal("0.10");
