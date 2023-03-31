@@ -29,8 +29,8 @@ public class PrinterController {
     }
 
 
-    public void printReceipt(PurchasedItems purchasedItems) throws OverloadException, InsufficientResourcesException {
-        ArrayList<BarcodedProduct> items = purchasedItems.getListOfProducts();
+    public void printReceipt() throws OverloadException, InsufficientResourcesException {
+        ArrayList<BarcodedProduct> items = PurchasedItems.getListOfProducts();
 
         // Give the receipt a title
         String receiptTitle = String.format("%23s\n", "-----RECEIPT-----") + String.format("%-9s %20s\n", "ITEMS", "PRICE");
@@ -46,8 +46,8 @@ public class PrinterController {
         }
 
         // End of the receipt, includes the total and change
-        String receiptChangeAndTotal = String.format("\n%-10s %18s$\n", "TOTAL:", purchasedItems.getTotalPrice().toString()) +
-                String.format("%-10s %17s$", "Change Due:", purchasedItems.getChange().toString());
+        String receiptChangeAndTotal = String.format("\n%-10s %18s$\n", "TOTAL:", PurchasedItems.getTotalPrice().toString()) +
+                String.format("%-10s %17s$", "Change Due:", PurchasedItems.getChange().toString());
 
         StringBuilder finalReceipt = new StringBuilder();
         finalReceipt.append(receiptTitle).append(receiptItems).append(receiptChangeAndTotal);
