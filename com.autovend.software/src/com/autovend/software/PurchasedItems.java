@@ -49,7 +49,7 @@ public class PurchasedItems{
         return listOfProducts;
     }
 
-    public static ArrayList<Product> getListOfOtherProducts(){
+    public static ArrayList<Product> getListOfBags(){
         return listOfBags;
     }
 

@@ -29,16 +29,22 @@ public class AddOrRemoveBags extends AddItem{
     }
 
     public void purchaseBag(Bag typeofBag) throws SimulationException {
-        if (typeofBag == null || !listOfStoreBags.contains(typeofBag)) {
+
+        if (typeofBag == null ) {
             throw new SimulationException("Please select a valid bag type.");
         }
-        else {
-            addBag(typeofBag);
+        for(Bag bag : listOfStoreBags) {
+            if(bag.getWeight() == typeofBag.getWeight() && bag.getPrice().equals(typeofBag.getPrice()) && bag.getDescription().equals(typeofBag.getDescription())) {
+                addBag(bag);
+                return;
+            }
         }
+        throw new SimulationException("Please select a valid bag type.");
     }
 
     public void addOwnBag(double bagWeight) {
-        Bag ownBag = new Bag("Own Bag", new BigDecimal(0), bagWeight);
+        Bag ownBag = new Bag("Own Bag", new BigDecimal(0.000001), bagWeight);
         addBag(ownBag);
+        PurchasedItems.addAmountPaid(ownBag.getPrice()); // This is done to avoid the exception thrown by the addBag method as the price cannot be zero
     }
 }
