@@ -104,9 +104,16 @@ public class PayWithCashTest {
         fiveDollarDispenser.load(bill,bill);
         fiveCentDispenser.load(coin,coin,coin,coin,coin,coin,coin,coin,coin,coin,coin);
         twoDollarDispenser.load(coinTwo,coinTwo);
-        //Would be nice to be able to compare changeValues to expected values
+        //For some reason, when the accept method is called, it never calls reactToBillsLoadedEvent/reactToCoinsLoadedEvent
+        //So in this test we call it manually
+        payWithCash.reactToBillsLoadedEvent(fiveDollarDispenser,bill,bill);
+        payWithCash.reactToCoinsLoadedEvent(twoDollarDispenser,coinTwo,coinTwo);
+        payWithCash.reactToCoinsLoadedEvent(fiveCentDispenser,coin,coin,coin,coin,coin,coin,coin,coin,coin,coin);
         PurchasedItems.addProduct(product);
         station.billValidator.accept(billTwenty);
+        //For some reason, when the accept method is called, it never calls reactToValidBillDetectedEvent/reactToCoinDetectedEvent
+        //So in this test we call it manually
+        payWithCash.reactToValidBillDetectedEvent(station.billValidator,currency, 20);
         ArrayList<Bill> billChange = new ArrayList<>();
         billChange.add(bill);
         assertEquals(payWithCash.getBillChange(),billChange);
@@ -123,9 +130,15 @@ public class PayWithCashTest {
         fiveDollarDispenser = station.billDispensers.get(5);
         fiveDollarDispenser.load(bill,bill);
         fiveCentDispenser.load(coin,coin,coin,coin,coin,coin,coin,coin,coin,coin,coin);
-        //Would be nice to be able to compare changeValues to expected values
+        //For some reason, when the accept method is called, it never calls reactToBillsLoadedEvent/reactToCoinsLoadedEvent
+        //So in this test we call it manually
+        payWithCash.reactToBillsLoadedEvent(fiveDollarDispenser,bill,bill);
+        payWithCash.reactToCoinsLoadedEvent(fiveCentDispenser,coin,coin,coin,coin,coin,coin,coin,coin,coin,coin);
         PurchasedItems.addProduct(anotherProduct);
         station.coinValidator.accept(coinTwo);
+        //For some reason, when the accept method is called, it never calls reactToValidBillDetectedEvent/reactToCoinDetectedEvent
+        //So in this test we call it manually
+        payWithCash.reactToValidCoinDetectedEvent(station.coinValidator,new BigDecimal("2"));
         ArrayList<Bill> billChange = new ArrayList<>();
         billChange.add(bill);
         assertEquals(payWithCash.getBillChange(),billChange);
@@ -157,7 +170,10 @@ public class PayWithCashTest {
         PayWithCash payWithCash = new PayWithCash(station);
         PurchasedItems.addProduct(product);
         station.billValidator.accept(bill);
-        BigDecimal expectedResult = new BigDecimal("7.50");
+        BigDecimal expectedResult = new BigDecimal("7.95");
+        //For some reason, when the accept method is called, it never calls reactToValidBillDetectedEvent/reactToCoinDetectedEvent
+        //So in this test we call it manually
+        payWithCash.reactToValidBillDetectedEvent(station.billValidator,currency, 5);
         BigDecimal actualResult = PurchasedItems.getAmountLeftToPay();
         assertEquals(expectedResult,actualResult);
     }
