@@ -101,7 +101,12 @@ public class PayWithCashTest {
         //Would be nice to be able to compare changeValues to expected values
         PurchasedItems.addProduct(product);
         station.billValidator.accept(billTwenty);
-
+        ArrayList<Bill> billChange = new ArrayList<>();
+        billChange.add(bill);
+        assertEquals(payWithCash.getBillChange(),billChange);
+        ArrayList<Coin> coinChange = new ArrayList<>();
+        coinChange.add(coin);
+        assertEquals(payWithCash.getCoinChange(),coinChange);
 
     }
 
